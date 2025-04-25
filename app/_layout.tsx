@@ -12,6 +12,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SignUpProvider } from '@/components/providers/SignUpProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -50,26 +51,28 @@ export default function RootLayout() {
       <GestureHandlerRootView style={styles.container}>
         <BottomSheetModalProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <SignUpProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  headerStyle: {
-                    backgroundColor: Colors[colorScheme ?? 'light'].background,
-                  },
-                  headerTintColor: Colors[colorScheme ?? 'light'].text,
-                }}
-              >
-                <Stack.Screen 
-                  name="(drawer)" 
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen 
-                  name="+not-found" 
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-            </SignUpProvider>
+            <AuthProvider>
+              <SignUpProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    headerStyle: {
+                      backgroundColor: Colors[colorScheme ?? 'light'].background,
+                    },
+                    headerTintColor: Colors[colorScheme ?? 'light'].text,
+                  }}
+                >
+                  <Stack.Screen 
+                    name="(drawer)" 
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen 
+                    name="+not-found" 
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </SignUpProvider>
+            </AuthProvider>
           </ThemeProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
