@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography } from '../theme/sizes';
 import { CourseCard } from '../components/CourseCard';
+import { useRouter } from 'expo-router';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -17,10 +18,11 @@ interface CategoryItemProps {
   icon: React.ReactNode;
   label: string;
   count?: number;
+  onPress?: () => void;
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, count }) => (
-  <TouchableOpacity style={styles.categoryItem}>
+const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, count, onPress }) => (
+  <TouchableOpacity style={styles.categoryItem} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
     <View style={styles.iconContainer}>
       {icon}
       {count !== undefined && (
@@ -34,12 +36,13 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, count }) => (
 );
 
 const TOPICS = [
-  'Mornings', 'Sleep', 'Yoga Nidra', 'Anxiety', 'Meditation',
+  'Mornings', 'Events', 'Yoga Nidra', 'Anxiety', 'Meditation',
   'Self-Love', 'Chakras', 'Buddhism', '+21k'
 ];
 
 export default function LibraryScreen() {
   const navigation = useNavigation<LibraryScreenNavigationProp>();
+  const router = useRouter();
 
   const handleDrawerOpen = () => {
     navigation.openDrawer();
@@ -73,10 +76,12 @@ export default function LibraryScreen() {
           <CategoryItem
             icon={<Ionicons name="headset-outline" size={28} color="#FFFFFF" />}
             label="Meditate"
+            onPress={() => router.push('/meditation' as any)}
           />
           <CategoryItem
             icon={<Ionicons name="moon-outline" size={28} color="#FFFFFF" />}
-            label="Sleep"
+            label="Events"
+            onPress={() => router.push('/events' as any)}
           />
           <CategoryItem
             icon={<Ionicons name="sunny-outline" size={28} color="#FFFFFF" />}

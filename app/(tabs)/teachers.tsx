@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography, elementSizes } from '../theme/sizes';
+import { Image } from '@/components/ui/Image';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -30,6 +31,8 @@ const TeacherProfile: React.FC<TeacherProfileProps> = ({ imageUrl, name }) => {
       <Image
         source={{ uri: imageUrl }}
         style={[styles.profileImage, { width: itemWidth, height: itemWidth }]}
+        contentFit="cover"
+        fallbackSource={{ uri: 'https://randomuser.me/api/portraits/women/1.jpg' }}
       />
       <Text style={styles.profileName} numberOfLines={1}>{name}</Text>
     </View>

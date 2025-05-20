@@ -95,6 +95,17 @@ export interface Course {
   tags: string[];
   level: 'beginner' | 'intermediate' | 'advanced';
   createdAt: Date;
+  updatedAt: Date;
+  totalEnrollments: number;
+  averageRating: number;
+  totalRatings: number;
+  isPublished: boolean;
+  price: number;
+  currency: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  prerequisites: string[];
+  learningObjectives: string[];
 }
 
 export interface CourseEnrollment {
@@ -102,6 +113,21 @@ export interface CourseEnrollment {
   courseId: string;
   enrolledAt: Date;
   completedLessons: string[];
+  progress: number; // Percentage of course completed
+  lastAccessedAt: Date;
+  status: 'active' | 'completed' | 'dropped';
+}
+
+export interface CourseRating {
+  ratingId: string;
+  courseId: string;
+  userId: string;
+  rating: number;
+  review: string;
+  createdAt: Date;
+  updatedAt: Date;
+  helpfulVotes: number;
+  isVerifiedEnrollment: boolean;
 }
 
 export interface MusicTrack {
@@ -144,6 +170,80 @@ export interface Teacher {
   name: string;
   bio: string;
   avatarUrl: string;
+  location: string;
   specialties: string[];
   rating: number;
+  totalCourses: number;
+  totalStudents: number;
+  courses: string[]; // Array of courseIds
+  followers: string[]; // Array of userIds
+  createdAt: Date;
+  updatedAt: Date;
+  socialLinks: {
+    website?: string;
+    instagram?: string;
+    youtube?: string;
+    twitter?: string;
+  };
+  certifications: string[];
+  languages: string[];
+  availability: {
+    isAvailable: boolean;
+    nextAvailableDate?: Date;
+  };
+  events: TeacherEvent[];
+  challenges: TeacherChallenge[];
+  updates: TeacherUpdate[];
+}
+
+export interface TeacherEvent {
+  eventId: string;
+  title: string;
+  description: string;
+  date: Date;
+  duration: string;
+  type: 'live' | 'workshop' | 'retreat';
+  isPlus: boolean;
+  maxParticipants?: number;
+  currentParticipants: number;
+  price?: number;
+  location?: string;
+  onlineLink?: string;
+}
+
+export interface TeacherChallenge {
+  challengeId: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  duration: string;
+  startDate: Date;
+  endDate: Date;
+  isPlus: boolean;
+  joinedCount: number;
+  imageUrl: string;
+  requirements: string[];
+  rewards: string[];
+}
+
+export interface TeacherUpdate {
+  updateId: string;
+  type: 'track' | 'course' | 'event' | 'challenge';
+  contentId: string;
+  title: string;
+  description: string;
+  createdAt: Date;
+  isPlus: boolean;
+}
+
+export interface TeacherRating {
+  ratingId: string;
+  teacherId: string;
+  userId: string;
+  rating: number;
+  review: string;
+  createdAt: Date;
+  updatedAt: Date;
+  helpfulVotes: number;
+  isVerifiedStudent: boolean;
 } 

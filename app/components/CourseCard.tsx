@@ -1,9 +1,9 @@
-import React, { useCallback, memo, useState } from 'react';
+import React, { useCallback, memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Image as ExpoImage } from 'expo-image';
 import { typography } from '../theme/sizes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from '@/components/ui/Image';
 
 interface CourseCardProps {
   title: string;
@@ -27,7 +27,6 @@ export function CourseCard({
   onPress,
 }: CourseCardProps) {
   const insets = useSafeAreaInsets();
-  const [imageLoading, setImageLoading] = useState(true);
 
   return (
     <TouchableOpacity 
@@ -39,23 +38,11 @@ export function CourseCard({
       accessibilityRole="button"
     >
       <View style={styles.card}>
-        {imageUrl ? (
-          <>
-            <ExpoImage
-              source={{ uri: imageUrl }}
-              transition={200}
-              contentFit="cover"
-              style={styles.image}
-              onLoadStart={() => setImageLoading(true)}
-              onLoadEnd={() => setImageLoading(false)}
-            />
-            {imageLoading && (
-              <View style={[styles.placeholderImage, styles.imageOverlay]} />
-            )}
-          </>
-        ) : (
-          <View style={styles.placeholderImage} />
-        )}
+        <Image
+          source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167' }}
+          style={styles.image}
+          contentFit="cover"
+        />
         <View style={styles.playButton}>
           <Ionicons name="play" size={20} color="#FFFFFF" />
         </View>
@@ -98,18 +85,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-  },
-  placeholderImage: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#2A2A2A',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   playButton: {
     position: 'absolute',

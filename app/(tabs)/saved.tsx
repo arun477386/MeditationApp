@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography } from '../theme/sizes';
+import { useRouter } from 'expo-router';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -52,6 +53,7 @@ const WindowSection: React.FC<WindowSectionProps> = ({ title }) => (
 
 export default function SavedScreen() {
   const navigation = useNavigation<SavedScreenNavigationProp>();
+  const router = useRouter();
 
   const handleDrawerOpen = () => {
     navigation.openDrawer();
@@ -131,6 +133,15 @@ export default function SavedScreen() {
           <TouchableOpacity style={styles.folderItem}>
             <Feather name="folder" size={24} color="#FFFFFF" />
             <Text style={styles.folderName}>Create a folder</Text>
+            <Feather name="chevron-right" size={24} color="#666666" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.folderItem}
+            onPress={() => router.push('/goto')}
+          >
+            <Feather name="navigation" size={24} color="#FFFFFF" />
+            <Text style={styles.folderName}>GoTo</Text>
             <Feather name="chevron-right" size={24} color="#666666" />
           </TouchableOpacity>
         </View>
