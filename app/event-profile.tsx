@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
   Linking,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -47,6 +48,16 @@ export default function EventProfileScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
   const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
+
+  const theme = {
+    background: '#121212',
+    cardBackground: '#1E1E1E',
+    text: '#FFFFFF',
+    textSecondary: '#AAAAAA',
+    border: '#2A2A2A',
+    accent: '#00bfa5',
+    card: '#232323',
+  };
 
   useEffect(() => {
     fetchEventDetails();
@@ -184,22 +195,30 @@ export default function EventProfileScreen() {
 
   if (isLoading || !event) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={theme.background}
+        />
         <View style={styles.loadingContainer}>
-          <Text>Loading event details...</Text>
+          <Text style={{ color: theme.text }}>Loading event details...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={theme.background}
+      />
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Feather name="arrow-left" size={24} color="#212529" />
+        <View style={[styles.header, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.cardBackground }]}>
+            <Feather name="arrow-left" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Event Details</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Event Details</Text>
           <View style={{ width: 40 }} />
         </View>
 
@@ -212,7 +231,7 @@ export default function EventProfileScreen() {
         )}
 
         <View style={styles.content}>
-          <Text style={styles.title}>{event.title}</Text>
+          <Text style={[styles.title, { color: theme.text }]}>{event.title}</Text>
           
           <View style={styles.teacherInfo}>
             {event.teacherAvatar && (
@@ -221,42 +240,42 @@ export default function EventProfileScreen() {
                 style={styles.teacherAvatar}
               />
             )}
-            <Text style={styles.teacherName}>{event.teacherName}</Text>
+            <Text style={[styles.teacherName, { color: theme.textSecondary }]}>{event.teacherName}</Text>
           </View>
 
-          <View style={styles.detailsContainer}>
+          <View style={[styles.detailsContainer, { backgroundColor: theme.card }]}>
             <View style={styles.detailRow}>
-              <Feather name="calendar" size={20} color="#495057" />
-              <Text style={styles.detailText}>
+              <Feather name="calendar" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
                 {event.date.toLocaleDateString()} at {event.date.toLocaleTimeString()}
               </Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Feather name="clock" size={20} color="#495057" />
-              <Text style={styles.detailText}>{event.duration} minutes</Text>
+              <Feather name="clock" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>{event.duration} minutes</Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Feather name="users" size={20} color="#495057" />
-              <Text style={styles.detailText}>
+              <Feather name="users" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
                 {event.currentParticipants}/{event.maxParticipants} participants
               </Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Feather name="tag" size={20} color="#495057" />
-              <Text style={styles.detailText}>${event.price}</Text>
+              <Feather name="tag" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>${event.price}</Text>
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.description}>{event.description}</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Description</Text>
+          <Text style={[styles.description, { color: theme.textSecondary }]}>{event.description}</Text>
 
           {event.location && (
             <>
-              <Text style={styles.sectionTitle}>Location</Text>
-              <Text style={styles.location}>{event.location}</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Location</Text>
+              <Text style={[styles.location, { color: theme.textSecondary }]}>{event.location}</Text>
               {event.coordinates && (
                 <TouchableOpacity
                   style={styles.mapContainer}
@@ -290,7 +309,7 @@ export default function EventProfileScreen() {
 
           {event.onlineLink && (
             <TouchableOpacity
-              style={styles.onlineButton}
+              style={[styles.onlineButton, { backgroundColor: theme.accent }]}
               onPress={handleJoinOnline}
             >
               <Feather name="video" size={20} color="#FFFFFF" />
@@ -301,6 +320,7 @@ export default function EventProfileScreen() {
           <TouchableOpacity
             style={[
               styles.registerButton,
+              { backgroundColor: theme.accent },
               isRegistered && styles.registeredButton,
               isLoading && styles.disabledButton,
             ]}
@@ -320,7 +340,6 @@ export default function EventProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   scrollView: {
     flex: 1,
@@ -335,22 +354,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FA',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
   },
   coverImage: {
     width: '100%',
@@ -362,7 +377,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#212529',
     marginBottom: 16,
   },
   teacherInfo: {
@@ -378,11 +392,9 @@ const styles = StyleSheet.create({
   },
   teacherName: {
     fontSize: 16,
-    color: '#495057',
     fontWeight: '500',
   },
   detailsContainer: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
@@ -394,24 +406,20 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 15,
-    color: '#495057',
     marginLeft: 12,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
     marginBottom: 8,
   },
   description: {
     fontSize: 15,
-    color: '#495057',
     lineHeight: 22,
     marginBottom: 24,
   },
   location: {
     fontSize: 15,
-    color: '#495057',
     marginBottom: 12,
   },
   mapContainer: {
@@ -441,7 +449,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#228BE6',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -453,7 +460,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   registerButton: {
-    backgroundColor: '#228BE6',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

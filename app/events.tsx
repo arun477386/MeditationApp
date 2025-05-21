@@ -6,7 +6,6 @@ import { useRouter } from 'expo-router';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useColorScheme } from 'react-native';
-import { Colors } from '@/constants/Colors';
 
 interface Event {
   id: string;
@@ -26,9 +25,18 @@ interface Event {
 export default function EventsScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const theme = {
+    background: '#121212',
+    cardBackground: '#1E1E1E',
+    text: '#FFFFFF',
+    textSecondary: '#AAAAAA',
+    border: '#2A2A2A',
+    accent: '#00bfa5',
+    card: '#232323',
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -83,37 +91,37 @@ export default function EventsScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.tint} />
+          <ActivityIndicator size="large" color={theme.accent} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
-        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
+        barStyle="light-content"
+        backgroundColor={theme.background}
       />
-      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: colors.card }]}>
-          <Feather name="arrow-left" size={24} color={colors.text} />
+      <View style={[styles.header, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.cardBackground }]}>
+          <Feather name="arrow-left" size={24} color={theme.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Events</Text>
-        <TouchableOpacity onPress={() => router.push('/create-event')} style={[styles.createButton, { backgroundColor: colors.card }]}>
-          <Feather name="plus" size={24} color={colors.tint} />
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Events</Text>
+        <TouchableOpacity onPress={() => router.push('/create-event')} style={[styles.createButton, { backgroundColor: theme.cardBackground }]}>
+          <Feather name="plus" size={24} color={theme.accent} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={[styles.content, { backgroundColor: colors.background }]}>
+      <ScrollView style={[styles.content, { backgroundColor: theme.background }]}>
         {events.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Feather name="calendar" size={48} color={colors.text} />
-            <Text style={[styles.emptyText, { color: colors.text }]}>No events found</Text>
+            <Feather name="calendar" size={48} color={theme.text} />
+            <Text style={[styles.emptyText, { color: theme.text }]}>No events found</Text>
             <TouchableOpacity
-              style={[styles.createEventButton, { backgroundColor: colors.tint }]}
+              style={[styles.createEventButton, { backgroundColor: theme.accent }]}
               onPress={() => router.push('/create-event')}
             >
               <Text style={styles.createEventButtonText}>Create Event</Text>
@@ -123,21 +131,21 @@ export default function EventsScreen() {
           events.map((event) => (
             <TouchableOpacity
               key={event.id}
-              style={[styles.eventCard, { backgroundColor: colors.card }]}
+              style={[styles.eventCard, { backgroundColor: theme.card }]}
               onPress={() => router.push(`/event-profile?id=${event.id}`)}
             >
               <Image source={{ uri: event.coverImage }} style={styles.eventImage} />
               <View style={styles.eventInfo}>
-                <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
-                <Text style={[styles.eventDate, { color: colors.icon }]}>{formatDate(event.date)}</Text>
-                <Text style={[styles.eventLocation, { color: colors.icon }]}>
+                <Text style={[styles.eventTitle, { color: theme.text }]}>{event.title}</Text>
+                <Text style={[styles.eventDate, { color: theme.textSecondary }]}>{formatDate(event.date)}</Text>
+                <Text style={[styles.eventLocation, { color: theme.textSecondary }]}>
                   {event.location || 'Online'}
                 </Text>
                 <View style={styles.eventFooter}>
-                  <Text style={[styles.eventPrice, { color: colors.tint }]}>
+                  <Text style={[styles.eventPrice, { color: theme.accent }]}>
                     {formatPrice(event.price)}
                   </Text>
-                  <Text style={[styles.eventType, { color: colors.icon }]}>
+                  <Text style={[styles.eventType, { color: theme.textSecondary }]}>
                     {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                   </Text>
                 </View>
@@ -160,9 +168,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderBottomWidth: 1,
   },
   backButton: {
     padding: 8,
+    borderRadius: 20,
   },
   headerTitle: {
     fontSize: 20,
@@ -170,6 +180,7 @@ const styles = StyleSheet.create({
   },
   createButton: {
     padding: 8,
+    borderRadius: 20,
   },
   content: {
     flex: 1,
