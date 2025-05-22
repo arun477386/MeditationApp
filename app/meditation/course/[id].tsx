@@ -93,11 +93,31 @@ export default function CourseProfileScreen() {
       if (sound) {
         if (isPlaying) {
           await sound.pauseAsync();
+          setIsPlaying(false);
         } else {
-          await sound.playAsync();
+          const status = await sound.getStatusAsync();
+          if (status.isLoaded) {
+            await sound.playAsync();
+            setIsPlaying(true);
+          } else {
+            // If sound is not loaded, create a new instance
+            const { sound: newSound } = await Audio.Sound.createAsync(
+              { uri: course.audio },
+              { shouldPlay: true },
+              onPlaybackStatusUpdate
+            );
+            setSound(newSound);
+            setIsPlaying(true);
+          }
         }
-        setIsPlaying(!isPlaying);
       } else {
+        // Stop any existing playback
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+        });
+
         const { sound: newSound } = await Audio.Sound.createAsync(
           { uri: course.audio },
           { shouldPlay: true },
@@ -122,6 +142,20 @@ export default function CourseProfileScreen() {
     }
   };
 
+  const handleBack = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      }
+    } catch (error) {
+      console.error('Error stopping audio:', error);
+    }
+    router.back();
+  };
+
   if (!course) {
     return null;
   }
@@ -131,7 +165,7 @@ export default function CourseProfileScreen() {
       <HeaderImageContainer>
         <ProfileImage source={{ uri: course.image }} resizeMode="cover" />
         <HeaderOverlay>
-          <HeaderButton onPress={() => router.back()} accessibilityLabel="Back">
+          <HeaderButton onPress={handleBack} accessibilityLabel="Back">
             <Ionicons name="arrow-back" size={28} color="#fff" />
           </HeaderButton>
           <HeaderIcons>
@@ -147,15 +181,15 @@ export default function CourseProfileScreen() {
           <MetaText>{course.type}</MetaText>
           <MetaText>{course.duration}</MetaText>
           {course.isPlus && <PlusBadge>Plus</PlusBadge>}
+          <TouchableOpacity accessibilityLabel="Bookmark" style={{ marginLeft: 'auto' }}>
+            <Feather name="bookmark" size={24} color="#fff" />
+          </TouchableOpacity>
         </MetaRow>
         <TitleRow>
           <ProfileTitle>{course.title}</ProfileTitle>
           <TitleActions>
             <TouchableOpacity accessibilityLabel="More options">
               <Feather name="more-horizontal" size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityLabel="Bookmark">
-              <Feather name="bookmark" size={24} color="#fff" />
             </TouchableOpacity>
           </TitleActions>
         </TitleRow>

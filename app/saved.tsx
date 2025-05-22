@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
-import { typography } from '../theme/sizes';
+import { typography } from './theme/sizes';
 import { useRouter } from 'expo-router';
 
 type RootDrawerParamList = {
@@ -62,7 +62,7 @@ export default function SavedScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Top Bar */}
-      <View style={styles.topBar}>
+      {/* <View style={styles.topBar}>
         <TouchableOpacity 
           style={styles.iconButton}
           onPress={handleDrawerOpen}
@@ -73,7 +73,7 @@ export default function SavedScreen() {
           <Text style={styles.notificationCount}>1</Text>
           <Feather name="droplet" size={24} color="#FFFFFF" />
         </View>
-      </View>
+      </View> */}
 
       <ScrollView style={styles.scrollView}>
         <Text style={styles.screenTitle}>Saved</Text>

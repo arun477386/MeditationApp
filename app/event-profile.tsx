@@ -39,6 +39,7 @@ interface EventData {
     latitude: number;
     longitude: number;
   };
+  endTime: Date;
 }
 
 export default function EventProfileScreen() {
@@ -108,6 +109,7 @@ export default function EventProfileScreen() {
         teacherName: teacherData?.name || 'Unknown Teacher',
         teacherAvatar: teacherData?.avatarUrl,
         coordinates,
+        endTime: eventData.endTime.toDate(),
       } as EventData);
     } catch (error) {
       console.error('Error fetching event:', error);
@@ -153,6 +155,7 @@ export default function EventProfileScreen() {
       // Update event participants
       await updateDoc(doc(db, 'eventsSunya', event.id), {
         currentParticipants: increment(1),
+        registeredUsers: arrayUnion(currentUser.uid)
       });
 
       // Update user's registered events
@@ -253,7 +256,9 @@ export default function EventProfileScreen() {
 
             <View style={styles.detailRow}>
               <Feather name="clock" size={20} color={theme.textSecondary} />
-              <Text style={[styles.detailText, { color: theme.textSecondary }]}>{event.duration} minutes</Text>
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
+                Ends at {event.endTime.toLocaleTimeString()}
+              </Text>
             </View>
 
             <View style={styles.detailRow}>

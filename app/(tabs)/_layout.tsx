@@ -60,16 +60,6 @@ export default function TabLayout() {
               }}
             />
             <Tabs.Screen
-              name="library"
-              options={{
-                title: 'Library',
-                headerShown: false,
-                tabBarIcon: ({ color, size }) => (
-                  <Feather name="search" size={24} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
               name="timer"
               options={{
                 title: 'Timer',
@@ -90,12 +80,32 @@ export default function TabLayout() {
               }}
             />
             <Tabs.Screen
+              name="checkin"
+              options={{
+                title: 'Check In',
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <Feather name="check-circle" size={24} color={color} />
+                ),
+              }}
+            />
+            {/* <Tabs.Screen
               name="saved"
               options={{
                 title: 'Saved',
                 headerShown: false,
                 tabBarIcon: ({ color, size }) => (
                   <Feather name="bookmark" size={24} color={color} />
+                ),
+              }}
+            /> */}
+            <Tabs.Screen
+              name="mainProfile"
+              options={{
+                title: 'Profile',
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <Feather name="user" size={24} color={color} />
                 ),
               }}
             />
