@@ -83,15 +83,35 @@ export default function PlayScreen() {
       Alert.alert('Error', 'No audio file available for this track');
       return;
     }
+
     try {
       if (sound) {
         if (isPlaying) {
           await sound.pauseAsync();
+          setIsPlaying(false);
         } else {
-          await sound.playAsync();
+          const status = await sound.getStatusAsync();
+          if (status.isLoaded) {
+            await sound.playAsync();
+            setIsPlaying(true);
+          } else {
+            // If sound is not loaded, create a new instance
+            const { sound: newSound } = await Audio.Sound.createAsync(
+              { uri: track.audio },
+              { shouldPlay: true },
+            );
+            setSound(newSound);
+            setIsPlaying(true);
+          }
         }
-        setIsPlaying(!isPlaying);
       } else {
+        // Stop any existing playback
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+        });
+
         const { sound: newSound } = await Audio.Sound.createAsync(
           { uri: track.audio },
           { shouldPlay: true },
@@ -100,10 +120,25 @@ export default function PlayScreen() {
         setIsPlaying(true);
       }
     } catch (error) {
+      console.error('Error playing audio:', error);
       Alert.alert('Error', 'Failed to play audio. Please try again.');
       setSound(null);
       setIsPlaying(false);
     }
+  };
+
+  const handleBack = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      }
+    } catch (error) {
+      console.error('Error stopping audio:', error);
+    }
+    router.back();
   };
 
   const formatDuration = (ms: number) => {
@@ -119,7 +154,7 @@ export default function PlayScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()} accessibilityLabel="Close">
+        <TouchableOpacity style={styles.headerBtn} onPress={handleBack} accessibilityLabel="Close">
           <Feather name="x" size={32} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.donateText}>Donate</Text>
@@ -143,7 +178,7 @@ export default function PlayScreen() {
         <View style={styles.progressBarBg}>
           <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
         </View>
-        <Text style={styles.progressTime}>{duration ? formatDuration(duration) : track.duration}</Text>
+        <Text style={styles.progressTime}>{formatDuration(duration)}</Text>
       </View>
       <View style={styles.controlsRow}>
         <Feather name="music" size={28} color="#fff" style={styles.icon} />
@@ -247,18 +282,26 @@ const styles = StyleSheet.create({
   controlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginHorizontal: 24,
     marginTop: 24,
+    gap: 24,
   },
   playBtn: {
     backgroundColor: '#fff2',
     borderRadius: 32,
     padding: 12,
     marginHorizontal: 12,
+    width: 64,
+    height: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   icon: {
     opacity: 0.7,
+    width: 28,
+    height: 28,
+    textAlign: 'center',
   },
   bottomRow: {
     marginTop: 32,

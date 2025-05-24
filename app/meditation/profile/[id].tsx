@@ -145,15 +145,15 @@ export default function MeditationProfileDetailScreen() {
           <MetaText>{track.rating} ★</MetaText>
           <MetaText>{track.type}</MetaText>
           <MetaText>{track.duration}</MetaText>
+          <TouchableOpacity accessibilityLabel="Bookmark" style={{ marginLeft: 'auto' }}>
+            <Feather name="bookmark" size={24} color="#fff" />
+          </TouchableOpacity>
         </MetaRow>
         <TitleRow>
           <ProfileTitle>{track.title}</ProfileTitle>
           <TitleActions>
             <TouchableOpacity accessibilityLabel="More options">
               <Feather name="more-horizontal" size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityLabel="Bookmark">
-              <Feather name="bookmark" size={24} color="#fff" />
             </TouchableOpacity>
           </TitleActions>
         </TitleRow>

@@ -15,11 +15,13 @@ export default function CreateEventScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [form, setForm] = useState({
     title: '',
     description: '',
     type: 'live' as 'live' | 'workshop' | 'retreat',
-    duration: '',
+    endTime: new Date(),
     maxParticipants: '',
     price: '',
     location: '',
@@ -29,6 +31,20 @@ export default function CreateEventScreen() {
 
   const handleChange = (key: string, value: string) => {
     setForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const handleEndTimeChange = (event: any, selectedTime?: Date) => {
+    setShowEndTimePicker(false);
+    if (selectedTime) {
+      setForm(prev => ({ ...prev, endTime: selectedTime }));
+    }
   };
 
   const pickImage = async () => {
@@ -57,7 +73,7 @@ export default function CreateEventScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!form.title || !form.description || !form.duration) {
+    if (!form.title || !form.description) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
@@ -118,7 +134,7 @@ export default function CreateEventScreen() {
         description: form.description.trim(),
         type: form.type,
         date: date,
-        duration: form.duration.trim(),
+        endTime: form.endTime,
         maxParticipants: form.maxParticipants ? parseInt(form.maxParticipants) : 0,
         price: form.price ? parseFloat(form.price) : 0,
         location: form.location.trim() || null,
@@ -126,7 +142,9 @@ export default function CreateEventScreen() {
         coverImageUrl: coverImageUrl || null,
         teacherId: currentUser.uid,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        registeredUsers: [], // Initialize empty array for registered users
+        currentParticipants: 0 // Initialize current participants count
       };
 
       await addDoc(eventsRef, eventData);
@@ -203,34 +221,76 @@ export default function CreateEventScreen() {
           </View>
 
           <Text style={styles.label}>Date & Time</Text>
-          <TouchableOpacity
-            style={styles.datePicker}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text>{date.toLocaleString()}</Text>
-          </TouchableOpacity>
+          <View style={styles.dateTimeContainer}>
+            <TouchableOpacity
+              style={[styles.datePicker, { flex: 1, marginRight: 8 }]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={{ color: '#212529' }}>{date.toLocaleDateString()}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.datePicker, { flex: 1, marginLeft: 8 }]}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <Text style={{ color: '#212529' }}>{date.toLocaleTimeString()}</Text>
+            </TouchableOpacity>
+          </View>
 
           {showDatePicker && (
+            <>
+              {Platform.OS === 'android' ? (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(false);
+                    if (selectedDate) {
+                      setDate(selectedDate);
+                    }
+                  }}
+                />
+              ) : (
+                <DateTimePicker
+                  value={date}
+                  mode="datetime"
+                  onChange={handleDateChange}
+                />
+              )}
+            </>
+          )}
+
+          {showTimePicker && Platform.OS === 'android' && (
             <DateTimePicker
               value={date}
-              mode="datetime"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  setDate(selectedDate);
+              mode="time"
+              onChange={(event, selectedTime) => {
+                setShowTimePicker(false);
+                if (selectedTime) {
+                  const updated = new Date(date);
+                  updated.setHours(selectedTime.getHours());
+                  updated.setMinutes(selectedTime.getMinutes());
+                  setDate(updated);
                 }
               }}
             />
           )}
 
-          <Text style={styles.label}>Duration (minutes)</Text>
-          <TextInput
-            style={styles.input}
-            value={form.duration}
-            onChangeText={(value) => handleChange('duration', value)}
-            placeholder="Duration in minutes"
-            keyboardType="numeric"
-          />
+          <Text style={styles.label}>End Time</Text>
+          <TouchableOpacity
+            style={styles.datePicker}
+            onPress={() => setShowEndTimePicker(true)}
+          >
+            <Text style={{ color: '#212529' }}>{form.endTime.toLocaleTimeString()}</Text>
+          </TouchableOpacity>
+
+          {showEndTimePicker && (
+            <DateTimePicker
+              value={form.endTime}
+              mode="time"
+              onChange={handleEndTimeChange}
+            />
+          )}
 
           <Text style={styles.label}>Max Participants</Text>
           <TextInput
@@ -367,12 +427,15 @@ const styles = StyleSheet.create({
   typeButtonTextActive: {
     color: '#FFFFFF',
   },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
   datePicker: {
     borderWidth: 1,
     borderColor: '#DEE2E6',
     borderRadius: 12,
     padding: 14,
-    marginBottom: 16,
     backgroundColor: '#FFFFFF',
   },
   imagePicker: {

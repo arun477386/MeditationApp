@@ -320,7 +320,7 @@ export function MeditationScreen() {
           </>
         )}
       </ScrollView>
-      <BottomNav style={{ backgroundColor: theme.bottomNav }}>
+      {/* <BottomNav style={{ backgroundColor: theme.bottomNav }}>
         <NavItem accessibilityRole="button" accessibilityLabel="Home" onPress={() => router.push('/')}> 
           <Ionicons name="home-outline" size={24} color="#fff" />
           <NavText>Home</NavText>
@@ -341,7 +341,7 @@ export function MeditationScreen() {
           <Ionicons name="bookmark-outline" size={24} color="#fff" />
           <NavText>Saved</NavText>
         </NavItem>
-      </BottomNav>
+      </BottomNav> */}
     </SafeAreaView>
   );
 }

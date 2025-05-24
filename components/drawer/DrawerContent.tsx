@@ -86,8 +86,8 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
   const drawerItems = [
     ...(user ? [] : [{ label: 'Sign up', icon: 'user' as const, action: handleSignUp }]),
+    { label: 'Check In', icon: 'check-circle' as const, route: 'checkin' },
     { label: 'Membership', icon: 'star' as const, route: 'membership' },
-    { label: 'Check-in', icon: 'check-circle' as const, route: 'check-in' },
     { label: 'Journal', icon: 'monitor' as const, route: 'journal' },
     { label: 'Notifications', icon: 'bell' as const, route: 'notifications' },
     { label: 'Friends', icon: 'users' as const, route: 'friends' },
