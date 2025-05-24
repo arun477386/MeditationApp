@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 
@@ -30,50 +30,6 @@ interface Course {
   points: number;
 }
 
-const tracks: Track[] = [
-  {
-    id: '1',
-    title: 'Vipassana (Basic) Meditation',
-    author: 'Tara Brach',
-    rating: 4.7,
-    type: 'Guided',
-    duration: '15 min',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
-  },
-  {
-    id: '2',
-    title: 'One Minute Meditation',
-    author: 'Don Reed Simmons',
-    rating: 4.6,
-    type: 'Guided',
-    duration: '1 min',
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-  },
-  {
-    id: '3',
-    title: 'Decrease Anxiety & Increase Peace',
-    author: 'Andrea Wachter',
-    rating: 4.8,
-    type: 'Guided',
-    duration: '17 min',
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca',
-  },
-];
-
-const courses = [
-  {
-    id: '101',
-    title: 'Meditation 101',
-    author: 'Rev. Skip Jennings',
-    rating: 4.8,
-    type: 'Course',
-    duration: '5 days',
-    isPlus: true,
-    image: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167',
-    points: 942,
-  },
-];
-
 interface Teacher {
   id: string;
   name: string;
@@ -82,7 +38,6 @@ interface Teacher {
 }
 
 const TABS = ['Tracks', 'Courses', 'Teachers'] as const;
-
 type Tab = typeof TABS[number];
 
 export function MeditationScreen() {
@@ -90,6 +45,7 @@ export function MeditationScreen() {
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -108,6 +64,27 @@ export function MeditationScreen() {
 
   const handleTabPress = (tab: Tab) => {
     setActiveTab(tab);
+  };
+
+  const handleTrackPress = (track: Track) => {
+    router.push({
+      pathname: '/meditation/play/[id]',
+      params: { id: track.id }
+    });
+  };
+
+  const handleCoursePress = (course: Course) => {
+    router.push({
+      pathname: '/meditation/course/[id]',
+      params: { id: course.id }
+    });
+  };
+
+  const handleTeacherPress = (teacher: Teacher) => {
+    router.push({
+      pathname: '/meditation/teacher/[id]',
+      params: { id: teacher.id }
+    });
   };
 
   useEffect(() => {
@@ -263,7 +240,7 @@ export function MeditationScreen() {
           <>
             <SectionTitle style={{ color: theme.text }}>Recommended</SectionTitle>
             {tracks.map(track => (
-              <TrackCard key={track.id} onPress={() => router.push(`/meditation/profile/${track.id}`)}>
+              <TrackCard key={track.id} onPress={() => handleTrackPress(track)}>
                 <TrackImage source={{ uri: track.image }} resizeMode="cover" />
                 <TrackInfo>
                   <TrackMeta>
@@ -286,7 +263,7 @@ export function MeditationScreen() {
             {courses.map(course => (
               <CourseCardContainer 
                 key={course.id}
-                onPress={() => router.push(`/meditation/course/${course.id}`)}
+                onPress={() => handleCoursePress(course)}
               >
                 <CourseImageWrapper>
                   <CourseImage source={{ uri: course.image }} resizeMode="cover" />
@@ -328,7 +305,7 @@ export function MeditationScreen() {
           <>
             <View style={styles.teachersContainer}>
               {teachers.map(teacher => (
-                <TeacherRow key={teacher.id} onPress={() => router.push(`/meditation/teacher/${teacher.id}`)}>
+                <TeacherRow key={teacher.id} onPress={() => handleTeacherPress(teacher)}>
                   <TeacherAvatar source={{ uri: teacher.avatar || 'default_image_url' }} />
                   <TeacherInfo>
                     <TeacherName>{teacher.name}</TeacherName>
