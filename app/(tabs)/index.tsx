@@ -64,14 +64,6 @@ export default function LibraryScreen() {
       </View>
 
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.title}>268,425</Text>
-          <Text style={styles.subtitle}>free guided meditations and music tracks.</Text>
-          <TouchableOpacity>
-            <Text style={styles.link}>Why we're free.</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.categoriesGrid}>
           <CategoryItem
             icon={<Ionicons name="headset-outline" size={28} color="#FFFFFF" />}
