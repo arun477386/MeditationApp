@@ -18,6 +18,8 @@ import { doc, getDoc, updateDoc, arrayUnion, increment } from 'firebase/firestor
 import { db, auth } from '@/services/firebase';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface EventData {
   id: string;
@@ -50,15 +52,8 @@ export default function EventProfileScreen() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
 
-  const theme = {
-    background: '#121212',
-    cardBackground: '#1E1E1E',
-    text: '#FFFFFF',
-    textSecondary: '#AAAAAA',
-    border: '#2A2A2A',
-    accent: '#00bfa5',
-    card: '#232323',
-  };
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   useEffect(() => {
     fetchEventDetails();
@@ -177,14 +172,13 @@ export default function EventProfileScreen() {
     if (!event?.coordinates) return;
 
     const { latitude, longitude } = event.coordinates;
-    const url = Platform.select({
-      ios: `maps:${latitude},${longitude}?q=${event.location}`,
-      android: `geo:${latitude},${longitude}?q=${event.location}`,
-    });
+    const label = encodeURIComponent(event.title || 'Event Location');
+    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}&query_place_id=${label}`;
 
-    if (url) {
-      Linking.openURL(url);
-    }
+    Linking.openURL(url).catch(err => {
+      Alert.alert('Error', 'Unable to open the map');
+      console.error('Map open error:', err);
+    });
   };
 
   const handleJoinOnline = () => {
@@ -200,7 +194,7 @@ export default function EventProfileScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <StatusBar
-          barStyle="light-content"
+          barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
           backgroundColor={theme.background}
         />
         <View style={styles.loadingContainer}>
@@ -213,12 +207,12 @@ export default function EventProfileScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
-        barStyle="light-content"
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
       />
       <ScrollView style={styles.scrollView}>
         <View style={[styles.header, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
-          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.cardBackground }]}>
+          <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.card }]}>
             <Feather name="arrow-left" size={24} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: theme.text }]}>Event Details</Text>
@@ -262,54 +256,54 @@ export default function EventProfileScreen() {
             </View>
 
             <View style={styles.detailRow}>
-              <Feather name="users" size={20} color={theme.textSecondary} />
+              <Feather name="map-pin" size={20} color={theme.textSecondary} />
               <Text style={[styles.detailText, { color: theme.textSecondary }]}>
-                {event.currentParticipants}/{event.maxParticipants} participants
+                {event.location || 'Online'}
               </Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Feather name="tag" size={20} color={theme.textSecondary} />
-              <Text style={[styles.detailText, { color: theme.textSecondary }]}>${event.price}</Text>
+              <Feather name="users" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
+                {event.currentParticipants} / {event.maxParticipants} participants
+              </Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Feather name="dollar-sign" size={20} color={theme.textSecondary} />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
+                {event.price === 0 ? 'Free' : `$${event.price}`}
+              </Text>
             </View>
           </View>
 
-          <Text style={[styles.sectionTitle, { color: theme.text }]}>Description</Text>
-          <Text style={[styles.description, { color: theme.textSecondary }]}>{event.description}</Text>
+          <Text style={[styles.description, { color: theme.text }]}>{event.description}</Text>
 
-          {event.location && (
-            <>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>Location</Text>
-              <Text style={[styles.location, { color: theme.textSecondary }]}>{event.location}</Text>
-              {event.coordinates && (
-                <TouchableOpacity
-                  style={styles.mapContainer}
-                  onPress={handleOpenMap}
-                >
-                  <MapView
-                    style={styles.map}
-                    initialRegion={{
-                      latitude: event.coordinates.latitude,
-                      longitude: event.coordinates.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    scrollEnabled={false}
-                    zoomEnabled={false}
-                  >
-                    <Marker
-                      coordinate={{
-                        latitude: event.coordinates.latitude,
-                        longitude: event.coordinates.longitude,
-                      }}
-                    />
-                  </MapView>
-                  <View style={styles.mapOverlay}>
-                    <Text style={styles.mapOverlayText}>Tap to open in Maps</Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </>
+          {event.coordinates && (
+            <TouchableOpacity style={styles.mapContainer} onPress={handleOpenMap}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: event.coordinates.latitude,
+                  longitude: event.coordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                scrollEnabled={false}
+                zoomEnabled={false}
+                pointerEvents="none"
+              >
+                <Marker
+                  coordinate={{
+                    latitude: event.coordinates.latitude,
+                    longitude: event.coordinates.longitude,
+                  }}
+                />
+              </MapView>
+              <View style={styles.mapOverlay}>
+                <Text style={styles.mapOverlayText}>Tap to open in Maps</Text>
+              </View>
+            </TouchableOpacity>
           )}
 
           {event.onlineLink && (
@@ -317,25 +311,18 @@ export default function EventProfileScreen() {
               style={[styles.onlineButton, { backgroundColor: theme.accent }]}
               onPress={handleJoinOnline}
             >
-              <Feather name="video" size={20} color="#FFFFFF" />
-              <Text style={styles.onlineButtonText}>Join Online</Text>
+              <Text style={[styles.onlineButtonText, { color: theme.background }]}>Join Online</Text>
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={[
-              styles.registerButton,
-              { backgroundColor: theme.accent },
-              isRegistered && styles.registeredButton,
-              isLoading && styles.disabledButton,
-            ]}
-            onPress={handleRegister}
-            disabled={isRegistered || isLoading}
-          >
-            <Text style={styles.registerButtonText}>
-              {isRegistered ? 'Registered' : 'Register Now'}
-            </Text>
-          </TouchableOpacity>
+          {!isRegistered && (
+            <TouchableOpacity
+              style={[styles.registerButton, { backgroundColor: theme.accent }]}
+              onPress={handleRegister}
+            >
+              <Text style={[styles.registerButtonText, { color: theme.background }]}>Register for Event</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -413,19 +400,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
   description: {
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 24,
-  },
-  location: {
-    fontSize: 15,
-    marginBottom: 12,
   },
   mapContainer: {
     height: 200,
@@ -451,29 +429,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   onlineButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
+    alignItems: 'center',
   },
   onlineButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
   },
   registerButton: {
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-  },
-  registeredButton: {
-    backgroundColor: '#40C057',
-  },
-  disabledButton: {
-    opacity: 0.7,
   },
   registerButtonText: {
     color: '#FFFFFF',

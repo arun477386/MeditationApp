@@ -6,25 +6,55 @@
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+/**
+ * Theme colors for the app. These colors are used throughout the app and support both light and dark modes.
+ */
+
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-    card: '#F5F5F5',
-    border: '#E0E0E0',
+    // Primary colors
+    primary: '#222222', // Near-black for headings
+    accent: '#17998C',  // Teal/green accent
+    plus: '#F4A62A',    // Orange
+    
+    // Background colors
+    background: '#FFFFFF',      // Pure white
+    surface: '#F7F7F7',        // Very light gray for surfaces
+    card: '#F7F7F7',           // Card/tile backgrounds
+    cardBackground: '#FFFFFF', // Card backgrounds (white)
+    
+    // Text colors
+    text: '#222222',           // Main text (black)
+    textSecondary: '#666666',  // Secondary text (medium gray)
+    icon: '#222222',           // Icons (black)
+    
+    // UI elements
+    border: '#E0E0E0',         // Light border
+    tabIconDefault: '#666666', // Inactive tab icon
+    tabIconSelected: '#222222',// Active tab icon
+    tint: '#17998C',           // Accent tint
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-    card: '#2A2A2A',
-    border: '#3A3A3A',
+    // Primary colors
+    primary: '#F4F4F4',        // Near-white for headings
+    accent: '#17998C',         // Teal/green accent
+    plus: '#F4A62A',           // Orange
+    
+    // Background colors
+    background: '#181818',     // Pure black/dark gray
+    surface: '#232323',        // Card/tile backgrounds
+    card: '#232323',           // Card/tile backgrounds
+    cardBackground: '#181818', // Card backgrounds (dark)
+    
+    // Text colors
+    text: '#F4F4F4',           // Main text (white)
+    textSecondary: '#BBBBBB',  // Secondary text (light gray)
+    icon: '#F4F4F4',           // Icons (white)
+    
+    // UI elements
+    border: '#232323',         // Dark border
+    tabIconDefault: '#BBBBBB', // Inactive tab icon
+    tabIconSelected: '#F4F4F4',// Active tab icon
+    tint: '#17998C',           // Accent tint
   },
 };

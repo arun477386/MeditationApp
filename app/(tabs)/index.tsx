@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -6,6 +6,8 @@ import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography } from '../theme/sizes';
 import { CourseCard } from '../components/CourseCard';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -19,19 +21,20 @@ interface CategoryItemProps {
   label: string;
   count?: number;
   onPress?: () => void;
+  theme: typeof Colors.light;
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, count, onPress }) => (
-  <TouchableOpacity style={styles.categoryItem} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
-    <View style={styles.iconContainer}>
+const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, count, onPress, theme }) => (
+  <TouchableOpacity style={[styles.categoryItem]} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
+    <View style={[styles.iconContainer, { backgroundColor: theme.card }]}> 
       {icon}
       {count !== undefined && (
-        <View style={styles.countBadge}>
-          <Text style={styles.countText}>{count}</Text>
+        <View style={[styles.countBadge, { backgroundColor: theme.plus }]}> 
+          <Text style={[styles.countText, { color: theme.text }]}>{count}</Text>
         </View>
       )}
     </View>
-    <Text style={styles.categoryLabel}>{label}</Text>
+    <Text style={[styles.categoryLabel, { color: theme.text }]}>{label}</Text>
   </TouchableOpacity>
 );
 
@@ -43,67 +46,81 @@ const TOPICS = [
 export default function LibraryScreen() {
   const navigation = useNavigation<LibraryScreenNavigationProp>();
   const router = useRouter();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   const handleDrawerOpen = () => {
     navigation.openDrawer();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}> 
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.background}
+      />
       {/* Top Bar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { backgroundColor: theme.background }]}> 
         <TouchableOpacity 
           style={styles.iconButton}
           onPress={handleDrawerOpen}
         >
-          <Feather name="menu" size={22} color="#FFFFFF" />
+          <Feather name="menu" size={22} color={theme.icon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton}>
-          <Feather name="search" size={22} color="#FFFFFF" />
+          <Feather name="search" size={22} color={theme.icon} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.categoriesGrid}>
           <CategoryItem
-            icon={<Ionicons name="headset-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="headset-outline" size={28} color={theme.icon} />}
             label="Meditate"
             onPress={() => router.push('/meditation' as any)}
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="moon-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="moon-outline" size={28} color={theme.icon} />}
             label="Events"
             onPress={() => router.push('/events' as any)}
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="sunny-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="sunny-outline" size={28} color={theme.icon} />}
             label="Mornings"
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="leaf-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="leaf-outline" size={28} color={theme.icon} />}
             label="Breathe"
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="leaf-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="leaf-outline" size={28} color={theme.icon} />}
             label="Beginners"
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="musical-notes-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="musical-notes-outline" size={28} color={theme.icon} />}
             label="Music"
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="school-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="school-outline" size={28} color={theme.icon} />}
             label="Courses"
             count={9}
+            theme={theme}
           />
           <CategoryItem
-            icon={<Ionicons name="trophy-outline" size={28} color="#FFFFFF" />}
+            icon={<Ionicons name="trophy-outline" size={28} color={theme.icon} />}
             label="Challenges"
+            theme={theme}
           />
         </View>
 
         <View style={styles.coursesSection}>
-          <Text style={styles.sectionTitle}>Courses for you</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Courses for you</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -127,14 +144,14 @@ export default function LibraryScreen() {
 
         {/* Topics Section */}
         <View style={styles.topicsSection}>
-          <Text style={styles.sectionTitle}>Topics</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Topics</Text>
           <View style={styles.topicsGrid}>
             {TOPICS.map((topic, index) => (
               <TouchableOpacity
                 key={index}
-                style={styles.topicPill}
+                style={[styles.topicPill, { borderColor: theme.accent }]}
               >
-                <Text style={styles.topicText}>{topic}</Text>
+                <Text style={[styles.topicText, { color: theme.accent }]}>{topic}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -142,8 +159,8 @@ export default function LibraryScreen() {
 
         {/* Get Started Section */}
         <View style={styles.getStartedSection}>
-          <Text style={styles.sectionTitle}>Get started</Text>
-          <Text style={styles.sectionSubtitle}>A personalized selection to get you started.</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Get started</Text>
+          <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>A personalized selection to get you started.</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -169,7 +186,7 @@ export default function LibraryScreen() {
 
         {/* 3 Mins For You Section */}
         <View style={styles.shortMeditationsSection}>
-          <Text style={styles.sectionTitle}>3 mins for you</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>3 mins for you</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -195,7 +212,6 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
   },
   topBar: {
     flexDirection: 'row',
@@ -219,19 +235,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '600',
     textAlign: 'center',
   },
   subtitle: {
-    color: '#FFFFFF',
     fontSize: 16,
     textAlign: 'center',
     marginTop: 8,
   },
   link: {
-    color: '#2D9B83',
     fontSize: 14,
     marginTop: 12,
   },
@@ -249,14 +262,12 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 56,
     height: 56,
-    backgroundColor: '#2A2A2A',
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
   },
   categoryLabel: {
-    color: '#FFFFFF',
     fontSize: 12,
     textAlign: 'center',
   },
@@ -264,7 +275,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#F4A62A',
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -272,7 +282,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   countText: {
-    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '600',
   },
@@ -281,7 +290,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   sectionTitle: {
-    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '600',
     marginBottom: 16,
@@ -305,11 +313,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#00BFA5',
     margin: 5,
   },
   topicText: {
-    color: '#00BFA5',
     fontSize: typography.bodySmall,
     fontWeight: '500',
   },
@@ -319,7 +325,6 @@ const styles = StyleSheet.create({
   },
   sectionSubtitle: {
     fontSize: typography.bodyMedium,
-    color: '#AAAAAA',
     marginTop: 4,
   },
   getStartedScroll: {

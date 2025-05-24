@@ -1,70 +1,76 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import theme, { typography, iconSizes, elementSizes } from '../theme/sizes';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 export default function ThemeExample() {
+  const colorScheme = useColorScheme() ?? 'light';
+  const themeColors = Colors[colorScheme];
+
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       {/* Header Example */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: themeColors.background }]}>
         <TouchableOpacity style={styles.iconButton}>
-          <Feather name="menu" size={iconSizes.medium} color="#FFFFFF" />
+          <Feather name="menu" size={iconSizes.medium} color={themeColors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New Screen</Text>
+        <ThemedText type="title">New Screen</ThemedText>
         <TouchableOpacity style={styles.iconButton}>
-          <Feather name="search" size={iconSizes.medium} color="#FFFFFF" />
+          <Feather name="search" size={iconSizes.medium} color={themeColors.text} />
         </TouchableOpacity>
       </View>
 
       {/* Content Example */}
       <View style={styles.content}>
-        <Text style={styles.title}>Main Title</Text>
-        <Text style={styles.subtitle}>Section Heading</Text>
-        <Text style={styles.bodyText}>
+        <ThemedText type="title">Main Title</ThemedText>
+        <ThemedText type="subtitle">Section Heading</ThemedText>
+        <ThemedText>
           This is an example of body text using the new standardized sizes.
           All future screens should follow these size guidelines.
-        </Text>
+        </ThemedText>
 
         {/* Button Example */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: themeColors.accent }]}>
           <Feather 
             name="plus" 
             size={iconSizes.small} 
-            color="#FFFFFF" 
+            color={themeColors.text} 
             style={styles.buttonIcon} 
           />
-          <Text style={styles.buttonText}>Action Button</Text>
+          <ThemedText style={styles.buttonText}>Action Button</ThemedText>
         </TouchableOpacity>
 
         {/* Card Example */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: themeColors.card }]}>
           <View style={styles.cardHeader}>
             <Feather 
               name="star" 
               size={iconSizes.large} 
-              color="#FFFFFF" 
+              color={themeColors.text} 
             />
-            <Text style={styles.cardTitle}>Feature Card</Text>
+            <ThemedText type="subtitle">Feature Card</ThemedText>
           </View>
-          <Text style={styles.cardText}>
+          <ThemedText style={{ color: themeColors.textSecondary }}>
             Cards and other UI components maintain consistent spacing and sizing.
-          </Text>
+          </ThemedText>
         </View>
 
         {/* Badge Example */}
-        <View style={styles.badgeContainer}>
-          <Text style={styles.badgeText}>New</Text>
+        <View style={[styles.badgeContainer, { backgroundColor: themeColors.plus }]}>
+          <ThemedText style={styles.badgeText}>New</ThemedText>
         </View>
       </View>
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
   },
   header: {
     height: elementSizes.topBarHeight,
@@ -72,11 +78,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: elementSizes.spacing.md,
-  },
-  headerTitle: {
-    fontSize: typography.h2,
-    color: '#FFFFFF',
-    fontWeight: '600',
   },
   iconButton: {
     width: elementSizes.iconButton,
@@ -87,26 +88,8 @@ const styles = StyleSheet.create({
   content: {
     padding: elementSizes.spacing.md,
   },
-  title: {
-    fontSize: typography.h1,
-    color: '#FFFFFF',
-    fontWeight: '600',
-    marginBottom: elementSizes.spacing.md,
-  },
-  subtitle: {
-    fontSize: typography.h2,
-    color: '#FFFFFF',
-    marginBottom: elementSizes.spacing.sm,
-  },
-  bodyText: {
-    fontSize: typography.bodyMedium,
-    color: '#FFFFFF',
-    lineHeight: typography.bodyMedium * typography.lineHeightNormal,
-    marginBottom: elementSizes.spacing.lg,
-  },
   button: {
     height: elementSizes.buttonHeight,
-    backgroundColor: '#2ECC71',
     borderRadius: elementSizes.buttonBorderRadius,
     flexDirection: 'row',
     alignItems: 'center',
@@ -119,11 +102,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: typography.bodyMedium,
-    color: '#FFFFFF',
     fontWeight: '600',
   },
   card: {
-    backgroundColor: '#2A2A2A',
     borderRadius: elementSizes.cardBorderRadius,
     padding: elementSizes.spacing.md,
     marginBottom: elementSizes.spacing.md,
@@ -133,19 +114,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: elementSizes.spacing.sm,
   },
-  cardTitle: {
-    fontSize: typography.h3,
-    color: '#FFFFFF',
-    fontWeight: '600',
-    marginLeft: elementSizes.spacing.sm,
-  },
-  cardText: {
-    fontSize: typography.bodyMedium,
-    color: '#AAAAAA',
-    lineHeight: typography.bodyMedium * typography.lineHeightNormal,
-  },
   badgeContainer: {
-    backgroundColor: '#F4A62A',
     borderRadius: elementSizes.badge / 2,
     height: elementSizes.badge,
     paddingHorizontal: elementSizes.spacing.sm,
@@ -154,7 +123,6 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: typography.micro,
-    color: '#FFFFFF',
     fontWeight: '600',
   },
 }); 

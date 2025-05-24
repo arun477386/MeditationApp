@@ -1,17 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Modal, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useColorScheme, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import WheelPicker from 'react-native-wheel-picker-expo';
 import { DurationPickerModal } from '../../components/duration-picker/duration-picker-modal';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 const { width } = Dimensions.get('window');
 
 export function TimerScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
   const [isDurationModalVisible, setDurationModalVisible] = React.useState(false);
   const [duration, setDuration] = React.useState({ hours: 0, minutes: 5, seconds: 0 });
 
@@ -21,92 +23,95 @@ export function TimerScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}>  
-      {/* Tabs */}
-      <View style={styles.tabsRow}>
-        <View style={styles.tabWithUnderline}>
-          <Text style={[styles.tabActive, { color: isDark ? '#fff' : '#222' }]}>Timer</Text>
-          <View style={styles.tabUnderline} />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>  
+      <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Tabs */}
+        <View style={styles.tabsRow}>
+          <View style={styles.tabWithUnderline}>
+            <Text style={[styles.tabActive, { color: theme.text }]} >Timer</Text>
+            <View style={[styles.tabUnderline, { backgroundColor: theme.text }]} />
+          </View>
+          <Text style={[styles.tabInactive, { color: theme.textSecondary }]}>Presets</Text>
         </View>
-        <Text style={styles.tabInactive}>Presets</Text>
-        <Feather name="more-horizontal" size={24} color={isDark ? '#fff' : '#222'} style={styles.moreIcon} />
-      </View>
 
-      {/* Bell Section */}
-      <View style={styles.bellSection}>
-        <Text style={styles.bellLabel}>Ending bell</Text>
-        <Image
-          source={require('../../assets/images/chinese-bell.png')}
-          style={styles.bellImage}
-          accessibilityLabel="Chinese bell"
+        {/* Bell Section */}
+        <View style={styles.bellSection}>
+          <Text style={[styles.bellLabel, { color: theme.text }]}>Ending bell</Text>
+          <Image
+            source={require('../../assets/images/chinese-bell.png')}
+            style={styles.bellImage}
+            accessibilityLabel="Chinese bell"
+          />
+          <View style={styles.bellLineRow}>
+            <View style={[styles.bellLine, { backgroundColor: theme.text }]} />
+            <View style={[styles.bellNumberCircle, { backgroundColor: theme.card }]}> 
+              <Text style={[styles.bellNumber, { color: theme.text }]} >1</Text>
+            </View>
+            <View style={[styles.bellLine, { backgroundColor: theme.text }]} />
+          </View>
+          <Text style={[styles.bellName, { color: theme.textSecondary }]}>Chinese Bell</Text>
+        </View>
+
+        {/* Settings List */}
+        <View style={styles.settingsList}>
+          <TouchableOpacity
+            style={styles.settingsRow}
+            accessibilityRole="button"
+            onPress={() => setDurationModalVisible(true)}
+          >
+            <Text style={[styles.settingsLabel, { color: theme.text }]}>Duration</Text>
+            <View style={styles.settingsValueRow}>
+              <Text style={[styles.settingsValue, { color: theme.textSecondary }]}>{formatDuration(duration)}</Text>
+              <Feather name="chevron-right" size={22} color={theme.icon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
+            <Text style={[styles.settingsLabel, { color: theme.text }]}>Ambient sounds</Text>
+            <View style={styles.settingsValueRow}>
+              <View style={[styles.newBadge, { backgroundColor: theme.plus }]}> <Text style={[styles.newBadgeText, { color: theme.background }]}>NEW</Text></View>
+              <Feather name="chevron-right" size={22} color={theme.icon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
+            <Text style={[styles.settingsLabel, { color: theme.text }]}>Interval bells</Text>
+            <View style={styles.settingsValueRow}>
+              <Text style={[styles.settingsValue, { color: theme.textSecondary }]}>None</Text>
+              <Feather name="chevron-right" size={22} color={theme.icon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
+            <Text style={[styles.settingsLabel, { color: theme.text }]}>Starting bell</Text>
+            <View style={styles.settingsValueRow}>
+              <Text style={[styles.settingsValue, { color: theme.textSecondary }]}>None</Text>
+              <Feather name="chevron-right" size={22} color={theme.icon} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Revert Button */}
+        <TouchableOpacity style={styles.revertBtn} accessibilityRole="button">
+          <Text style={[styles.revertText, { color: theme.accent }]}>Revert to basic Timer &gt;&gt;</Text>
+        </TouchableOpacity>
+
+        {/* Play Button and Volume */}
+        <View style={styles.bottomRow}>
+          <View style={styles.volumeRow}>
+            <Feather name="volume-2" size={20} color={theme.icon} />
+            <Text style={[styles.volumeText, { color: theme.textSecondary }]}>66%</Text>
+          </View>
+          <TouchableOpacity style={[styles.playBtn, { backgroundColor: theme.accent }]} accessibilityRole="button" accessibilityLabel="Start timer">
+            <Feather name="play" size={48} color={theme.background} />
+          </TouchableOpacity>
+          <Feather name="more-horizontal" size={24} color={theme.icon} style={styles.bottomMoreIcon} />
+        </View>
+
+        <DurationPickerModal
+          isVisible={isDurationModalVisible}
+          onClose={() => setDurationModalVisible(false)}
+          onSave={setDuration}
+          initialDuration={duration}
         />
-        <View style={styles.bellLineRow}>
-          <View style={styles.bellLine} />
-          <View style={styles.bellNumberCircle}><Text style={styles.bellNumber}>1</Text></View>
-          <View style={styles.bellLine} />
-        </View>
-        <Text style={styles.bellName}>Chinese Bell</Text>
-      </View>
-
-      {/* Settings List */}
-      <View style={styles.settingsList}>
-        <TouchableOpacity
-          style={styles.settingsRow}
-          accessibilityRole="button"
-          onPress={() => setDurationModalVisible(true)}
-        >
-          <Text style={styles.settingsLabel}>Duration</Text>
-          <View style={styles.settingsValueRow}>
-            <Text style={styles.settingsValue}>{formatDuration(duration)}</Text>
-            <Feather name="chevron-right" size={22} color="#fff" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
-          <Text style={styles.settingsLabel}>Ambient sounds</Text>
-          <View style={styles.settingsValueRow}>
-            <View style={styles.newBadge}><Text style={styles.newBadgeText}>NEW</Text></View>
-            <Feather name="chevron-right" size={22} color="#fff" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
-          <Text style={styles.settingsLabel}>Interval bells</Text>
-          <View style={styles.settingsValueRow}>
-            <Text style={styles.settingsValue}>None</Text>
-            <Feather name="chevron-right" size={22} color="#fff" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.settingsRow} accessibilityRole="button">
-          <Text style={styles.settingsLabel}>Starting bell</Text>
-          <View style={styles.settingsValueRow}>
-            <Text style={styles.settingsValue}>None</Text>
-            <Feather name="chevron-right" size={22} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Revert Button */}
-      <TouchableOpacity style={styles.revertBtn} accessibilityRole="button">
-        <Text style={styles.revertText}>Revert to basic Timer &gt;&gt;</Text>
-      </TouchableOpacity>
-
-      {/* Play Button and Volume */}
-      <View style={styles.bottomRow}>
-        <View style={styles.volumeRow}>
-          <Feather name="volume-2" size={20} color="#fff" />
-          <Text style={styles.volumeText}>66%</Text>
-        </View>
-        <TouchableOpacity style={styles.playBtn} accessibilityRole="button" accessibilityLabel="Start timer">
-          <Feather name="play" size={48} color={isDark ? '#000' : '#fff'} />
-        </TouchableOpacity>
-        <Feather name="more-horizontal" size={24} color="#fff" style={styles.bottomMoreIcon} />
-      </View>
-
-      <DurationPickerModal
-        isVisible={isDurationModalVisible}
-        onClose={() => setDurationModalVisible(false)}
-        onSave={setDuration}
-        initialDuration={duration}
-      />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -114,7 +119,6 @@ export function TimerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
     paddingTop: 0,
     paddingBottom: 0,
     justifyContent: 'flex-start',
@@ -141,7 +145,6 @@ const styles = StyleSheet.create({
   tabInactive: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#888',
     opacity: 0.5,
   },
   moreIcon: {
@@ -156,7 +159,6 @@ const styles = StyleSheet.create({
     bottom: -4,
     height: 2,
     width: '100%',
-    backgroundColor: '#fff',
     borderRadius: 1,
   },
   bellSection: {
@@ -165,7 +167,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   bellLabel: {
-    color: '#fff',
     fontSize: 20,
     marginBottom: 16,
     textAlign: 'center',
@@ -186,125 +187,96 @@ const styles = StyleSheet.create({
   bellLine: {
     height: 2,
     width: 48,
-    backgroundColor: '#fff',
     opacity: 0.3,
   },
   bellNumberCircle: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
   },
   bellNumber: {
-    color: '#000',
-    fontWeight: '700',
     fontSize: 16,
+    fontWeight: '700',
   },
   bellName: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 2,
+    fontSize: 16,
+    marginTop: 8,
     textAlign: 'center',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   settingsList: {
-    marginHorizontal: 0,
-    marginBottom: 8,
-    backgroundColor: 'transparent',
+    marginTop: 12,
+    marginBottom: 12,
   },
   settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 18,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#222',
   },
   settingsLabel: {
-    color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '500',
   },
   settingsValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   settingsValue: {
-    color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     marginRight: 8,
-    fontWeight: '400',
-    opacity: 0.7,
   },
   newBadge: {
-    backgroundColor: '#FFA726',
-    borderRadius: 4,
+    borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
     marginRight: 8,
   },
   newBadgeText: {
-    color: '#fff',
+    fontSize: 12,
     fontWeight: '700',
-    fontSize: 14,
   },
   revertBtn: {
-    alignItems: 'center',
-    marginVertical: 24,
+    alignSelf: 'center',
+    marginTop: 16,
+    marginBottom: 8,
   },
   revertText: {
-    color: '#888',
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: '500',
   },
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    marginTop: 24,
     marginBottom: 24,
   },
   volumeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 32,
   },
   volumeText: {
-    color: '#fff',
-    fontSize: 18,
-    marginLeft: 4,
-    fontWeight: '500',
+    fontSize: 16,
+    marginLeft: 8,
   },
   playBtn: {
-    backgroundColor: '#fff',
-    borderRadius: 32,
-    width: 64,
-    height: 64,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 16,
-    marginRight: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
   },
   bottomMoreIcon: {
-    marginLeft: 32,
+    alignSelf: 'center',
+    marginLeft: 24,
+    marginRight: 4,
   },
 });
 

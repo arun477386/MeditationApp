@@ -2,17 +2,18 @@ import { Stack } from 'expo-router';
 import { useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { Platform, StyleSheet, StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SignUpProvider } from '@/components/providers/SignUpProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { ThemeProvider } from 'styled-components/native';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -24,7 +25,18 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
+
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
 
   const onLayoutRootView = useCallback(async () => {
     if (loaded) {
@@ -50,34 +62,36 @@ export default function RootLayout() {
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <GestureHandlerRootView style={styles.container}>
         <StatusBar
-          barStyle="light-content"
-          backgroundColor="#121212"
+          barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+          backgroundColor={theme.background}
           translucent={true}
         />
         <BottomSheetModalProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <AuthProvider>
-              <SignUpProvider>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    headerStyle: {
-                      backgroundColor: Colors[colorScheme ?? 'light'].background,
-                    },
-                    headerTintColor: Colors[colorScheme ?? 'light'].text,
-                  }}
-                >
-                  <Stack.Screen 
-                    name="(drawer)" 
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen 
-                    name="+not-found" 
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-              </SignUpProvider>
-            </AuthProvider>
+          <ThemeProvider theme={theme}>
+            <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <AuthProvider>
+                <SignUpProvider>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      headerStyle: {
+                        backgroundColor: theme.background,
+                      },
+                      headerTintColor: theme.text,
+                    }}
+                  >
+                    <Stack.Screen 
+                      name="(drawer)" 
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen 
+                      name="+not-found" 
+                      options={{ headerShown: false }}
+                    />
+                  </Stack>
+                </SignUpProvider>
+              </AuthProvider>
+            </NavigationThemeProvider>
           </ThemeProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>

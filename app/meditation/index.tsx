@@ -3,7 +3,8 @@ import { View, Text, ScrollView, Image, TouchableOpacity, useWindowDimensions, S
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { Ionicons, Feather } from '@expo/vector-icons';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/services/firebase';
@@ -42,7 +43,7 @@ type Tab = typeof TABS[number];
 
 export function MeditationScreen() {
   const [activeTab, setActiveTab] = React.useState<Tab>('Tracks');
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? 'light';
   const { width } = useWindowDimensions();
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -50,17 +51,7 @@ export function MeditationScreen() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
 
-  const theme = {
-    background: '#121212',
-    cardBackground: '#1E1E1E',
-    text: '#FFFFFF',
-    textSecondary: '#AAAAAA',
-    border: '#2A2A2A',
-    accent: '#00bfa5',
-    plus: '#f4a62a',
-    card: '#232323',
-    bottomNav: '#181818'
-  };
+  const theme = Colors[colorScheme];
 
   const handleTabPress = (tab: Tab) => {
     setActiveTab(tab);
@@ -348,7 +339,7 @@ export function MeditationScreen() {
 
 const Container = styled.View`
   flex: 1;
-  background: #121212;
+  background: ${({ theme }) => theme.background};
 `;
 
 const HeaderRow = styled.View`
@@ -356,9 +347,9 @@ const HeaderRow = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background-color: #121212;
+  background-color: ${({ theme }) => theme.background};
   border-bottom-width: 1px;
-  border-bottom-color: #2A2A2A;
+  border-bottom-color: ${({ theme }) => theme.border};
 `;
 
 const HeaderLeft = styled.View`
@@ -372,18 +363,19 @@ const HeaderRight = styled.View`
 `;
 
 const HeaderTitle = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 20px;
   font-weight: 600;
 `;
 
 const Title = styled.Text`
+  color: ${({ theme }) => theme.text};
   font-size: 32px;
   font-weight: 700;
 `;
 
 const Description = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 16px;
   margin: 8px 16px 0 16px;
 `;
@@ -397,19 +389,20 @@ const TabRow = styled.View`
 const TabButton = styled.TouchableOpacity<{ isActive: boolean }>`
   margin-right: 24px;
   border-bottom-width: 2px;
-  border-bottom-color: ${({ isActive }) => (isActive ? '#fff' : 'transparent')};
+  border-bottom-color: ${({ isActive, theme }) => (isActive ? theme.text : 'transparent')};
   padding-bottom: 4px;
   min-width: 60px;
 `;
 
 const TabText = styled.Text<{ isActive: boolean }>`
-  color: ${({ isActive }) => (isActive ? '#fff' : '#aaa')};
+  color: ${({ isActive, theme }) => (isActive ? theme.text : theme.textSecondary)};
   font-size: 18px;
   font-weight: 600;
   text-align: center;
 `;
 
 const SectionTitle = styled.Text`
+  color: ${({ theme }) => theme.text};
   font-size: 24px;
   font-weight: 600;
   margin: 24px 16px 16px;
@@ -418,7 +411,7 @@ const SectionTitle = styled.Text`
 const TrackCard = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
-  background: #232323;
+  background: ${({ theme }) => theme.card};
   border-radius: 16px;
   margin: 0 16px 16px 16px;
   padding: 12px;
@@ -442,37 +435,37 @@ const TrackMeta = styled.View`
 `;
 
 const TrackRating = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 14px;
   margin-right: 8px;
 `;
 
 const TrackType = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 14px;
   margin-right: 8px;
 `;
 
 const TrackDuration = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 14px;
 `;
 
 const TrackTitle = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 16px;
   font-weight: 700;
 `;
 
 const TrackAuthor = styled.Text`
-  color: #aaa;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 14px;
 `;
 
 const PlaylistRow = styled.View`
   flex-direction: row;
   align-items: center;
-  background: #232323;
+  background: ${({ theme }) => theme.card};
   border-radius: 16px;
   margin: 0 16px 16px 16px;
   padding: 12px;
@@ -496,13 +489,13 @@ const PlaylistInfo = styled.View`
 `;
 
 const PlaylistTitle = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 16px;
   font-weight: 600;
 `;
 
 const PointsButton = styled.View`
-  background: #00bfa5;
+  background: ${({ theme }) => theme.accent};
   border-radius: 20px;
   padding: 8px 20px;
   align-items: center;
@@ -510,7 +503,7 @@ const PointsButton = styled.View`
 `;
 
 const PointsText = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 16px;
   font-weight: 700;
 `;
@@ -519,7 +512,7 @@ const BottomNav = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: #181818;
+  background: ${({ theme }) => theme.surface};
   padding: 8px 0 8px 0;
 `;
 
@@ -529,13 +522,13 @@ const NavItem = styled.TouchableOpacity`
 `;
 
 const NavText = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 12px;
   margin-top: 2px;
 `;
 
 const CourseCardContainer = styled.TouchableOpacity`
-  background: #232323;
+  background: ${({ theme }) => theme.card};
   border-radius: 20px;
   margin: 0 16px 24px 16px;
   padding: 0 0 16px 0;
@@ -571,39 +564,39 @@ const CourseMetaRow = styled.View`
 `;
 
 const CourseRating = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 15px;
   margin-right: 8px;
 `;
 
 const CourseType = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 15px;
   margin-right: 8px;
 `;
 
 const CourseDuration = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 15px;
   margin-right: 8px;
 `;
 
 const CoursePlus = styled.Text`
-  color: #f4a62a;
+  color: ${({ theme }) => theme.plus};
   font-size: 15px;
   font-weight: 700;
   margin-left: 2px;
 `;
 
 const CourseTitle = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 22px;
   font-weight: 700;
   margin: 8px 0 0 16px;
 `;
 
 const CourseAuthor = styled.Text`
-  color: #aaa;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 16px;
   margin: 0;
 `;
@@ -615,7 +608,7 @@ const CourseActionsRow = styled.View`
 `;
 
 const CoursePointsButton = styled.View`
-  background: #00bfa5;
+  background: ${({ theme }) => theme.accent};
   border-radius: 20px;
   padding: 8px 20px;
   align-items: center;
@@ -642,18 +635,18 @@ const TeacherInfo = styled.View`
 `;
 
 const TeacherName = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 20px;
   font-weight: 700;
 `;
 
 const TeacherLocation = styled.Text`
-  color: #aaa;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 15px;
 `;
 
 const FollowButton = styled.TouchableOpacity`
-  background: #00bfa5;
+  background: ${({ theme }) => theme.accent};
   border-radius: 8px;
   padding: 8px 24px;
   align-items: center;
@@ -661,14 +654,14 @@ const FollowButton = styled.TouchableOpacity`
 `;
 
 const FollowButtonText = styled.Text`
-  color: #fff;
+  color: ${({ theme }) => theme.text};
   font-size: 16px;
   font-weight: 700;
 `;
 
 const StickyTabsContainer = styled.View`
   padding: 8px 16px;
-  background-color: #121212;
+  background-color: ${({ theme }) => theme.background};
 `;
 
 const styles = StyleSheet.create({

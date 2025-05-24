@@ -5,7 +5,8 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface Event {
   id: string;
@@ -24,19 +25,11 @@ interface Event {
 
 export default function EventsScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? 'light';
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const theme = {
-    background: '#121212',
-    cardBackground: '#1E1E1E',
-    text: '#FFFFFF',
-    textSecondary: '#AAAAAA',
-    border: '#2A2A2A',
-    accent: '#00bfa5',
-    card: '#232323',
-  };
+  const theme = Colors[colorScheme];
 
   useEffect(() => {
     fetchEvents();
@@ -102,15 +95,15 @@ export default function EventsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar
-        barStyle="light-content"
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
       />
       <View style={[styles.header, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
-        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.cardBackground }]}>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: theme.card }]}>
           <Feather name="arrow-left" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: theme.text }]}>Events</Text>
-        <TouchableOpacity onPress={() => router.push('/create-event')} style={[styles.createButton, { backgroundColor: theme.cardBackground }]}>
+        <TouchableOpacity onPress={() => router.push('/create-event')} style={[styles.createButton, { backgroundColor: theme.card }]}>
           <Feather name="plus" size={24} color={theme.accent} />
         </TouchableOpacity>
       </View>
@@ -124,7 +117,7 @@ export default function EventsScreen() {
               style={[styles.createEventButton, { backgroundColor: theme.accent }]}
               onPress={() => router.push('/create-event')}
             >
-              <Text style={styles.createEventButtonText}>Create Event</Text>
+              <Text style={[styles.createEventButtonText, { color: theme.background }]}>Create Event</Text>
             </TouchableOpacity>
           </View>
         ) : (

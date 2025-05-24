@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography } from './theme/sizes';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -15,9 +17,10 @@ type SavedScreenNavigationProp = DrawerNavigationProp<RootDrawerParamList, '(tab
 
 interface GridItemProps {
   index: number;
+  theme: typeof Colors.light;
 }
 
-const GridItem: React.FC<GridItemProps> = ({ index }) => {
+const GridItem: React.FC<GridItemProps> = ({ index, theme }) => {
   // Calculate border radius based on position
   const style = {
     ...styles.thumbnailContent,
@@ -25,6 +28,7 @@ const GridItem: React.FC<GridItemProps> = ({ index }) => {
     borderTopRightRadius: index === 1 ? 8 : 0,
     borderBottomLeftRadius: index === 2 ? 8 : 0,
     borderBottomRightRadius: index === 3 ? 8 : 0,
+    backgroundColor: theme.card,
   };
 
   return (
@@ -36,17 +40,18 @@ const GridItem: React.FC<GridItemProps> = ({ index }) => {
 
 interface WindowSectionProps {
   title: string;
+  theme: typeof Colors.light;
 }
 
-const WindowSection: React.FC<WindowSectionProps> = ({ title }) => (
+const WindowSection: React.FC<WindowSectionProps> = ({ title, theme }) => (
   <View style={styles.windowSection}>
     <TouchableOpacity>
       <View style={styles.grid}>
         {[0, 1, 2, 3].map((index) => (
-          <GridItem key={index} index={index} />
+          <GridItem key={index} index={index} theme={theme} />
         ))}
       </View>
-      <Text style={styles.windowTitle}>{title}</Text>
+      <Text style={[styles.windowTitle, { color: theme.text }]}>{title}</Text>
     </TouchableOpacity>
   </View>
 );
@@ -54,13 +59,15 @@ const WindowSection: React.FC<WindowSectionProps> = ({ title }) => (
 export default function SavedScreen() {
   const navigation = useNavigation<SavedScreenNavigationProp>();
   const router = useRouter();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   const handleDrawerOpen = () => {
     navigation.openDrawer();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Top Bar */}
       {/* <View style={styles.topBar}>
         <TouchableOpacity 
@@ -76,73 +83,73 @@ export default function SavedScreen() {
       </View> */}
 
       <ScrollView style={styles.scrollView}>
-        <Text style={styles.screenTitle}>Saved</Text>
+        <Text style={[styles.screenTitle, { color: theme.text }]}>Saved</Text>
 
         {/* Windows Section */}
         <View style={styles.windowsContainer}>
-          <WindowSection title="Recently Played" />
-          <WindowSection title="Listen Later" />
+          <WindowSection title="Recently Played" theme={theme} />
+          <WindowSection title="Listen Later" theme={theme} />
         </View>
 
         {/* Folders Section */}
         <View style={styles.section}>
           <View style={styles.folderHeader}>
-            <Text style={styles.sectionTitle}>Folders</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Folders</Text>
             <TouchableOpacity>
-              <Text style={styles.editButton}>Edit</Text>
+              <Text style={[styles.editButton, { color: theme.accent }]}>Edit</Text>
             </TouchableOpacity>
           </View>
 
           {/* Folder Items */}
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="bookmark" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Bookmarks</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="bookmark" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Bookmarks</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="music" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Playlists</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="music" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Playlists</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="book" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Journal</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="book" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Journal</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="award" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Challenges</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="award" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Challenges</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="book-open" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Courses</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="book-open" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Courses</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="download-cloud" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Downloads</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="download-cloud" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Downloads</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.folderItem}>
-            <Feather name="folder" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>Create a folder</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="folder" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>Create a folder</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.folderItem}
             onPress={() => router.push('/goto')}
           >
-            <Feather name="navigation" size={24} color="#FFFFFF" />
-            <Text style={styles.folderName}>GoTo</Text>
-            <Feather name="chevron-right" size={24} color="#666666" />
+            <Feather name="navigation" size={24} color={theme.icon} />
+            <Text style={[styles.folderName, { color: theme.text }]}>GoTo</Text>
+            <Feather name="chevron-right" size={24} color={theme.textSecondary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -153,7 +160,6 @@ export default function SavedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
   },
   topBar: {
     flexDirection: 'row',

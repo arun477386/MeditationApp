@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { typography } from '../theme/sizes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from '@/components/ui/Image';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface CourseCardProps {
   title: string;
@@ -27,6 +29,8 @@ export function CourseCard({
   onPress,
 }: CourseCardProps) {
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   return (
     <TouchableOpacity 
@@ -37,33 +41,33 @@ export function CourseCard({
       accessibilityLabel={`Course: ${title} by ${instructor}`}
       accessibilityRole="button"
     >
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: theme.card }]}> 
         <Image
           source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167' }}
           style={styles.image}
           contentFit="cover"
         />
-        <View style={styles.playButton}>
-          <Ionicons name="play" size={20} color="#FFFFFF" />
+        <View style={[styles.playButton, { backgroundColor: theme.icon + '33' }]}> 
+          <Ionicons name="play" size={20} color={theme.background} />
         </View>
       </View>
       
       <View style={styles.info}>
         {(rating || duration || type) && (
           <View style={styles.metaRow}>
-            {rating && <Text style={styles.rating}>{rating}★</Text>}
-            {type && <Text style={styles.meta}>{type}</Text>}
-            {duration && <Text style={styles.meta}>· {duration} days</Text>}
+            {rating && <Text style={[styles.rating, { color: theme.text }]}>{rating}★</Text>}
+            {type && <Text style={[styles.meta, { color: theme.textSecondary }]}>{type}</Text>}
+            {duration && <Text style={[styles.meta, { color: theme.textSecondary }]}>· {duration} days</Text>}
             {isPlus && (
-              <View style={styles.plusBadge}>
-                <Text style={styles.plusBadgeText}>Plus</Text>
+              <View style={[styles.plusBadge, { backgroundColor: theme.plus }]}> 
+                <Text style={[styles.plusBadgeText, { color: theme.background }]}>Plus</Text>
               </View>
             )}
           </View>
         )}
         
-        <Text style={styles.title} numberOfLines={2}>{title}</Text>
-        <Text style={styles.instructor}>{instructor}</Text>
+        <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>{title}</Text>
+        <Text style={[styles.instructor, { color: theme.textSecondary }]}>{instructor}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -77,7 +81,6 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     height: 160,
-    backgroundColor: '#2A2A2A',
     borderRadius: 16,
     marginBottom: 12,
     overflow: 'hidden',
@@ -93,7 +96,6 @@ const styles = StyleSheet.create({
     transform: [{ translateX: -22 }, { translateY: -22 }],
     width: 44,
     height: 44,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
@@ -108,15 +110,12 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: typography.bodySmall,
-    color: '#FFFFFF',
     marginRight: 6,
   },
   meta: {
     fontSize: typography.bodySmall,
-    color: '#AAAAAA',
   },
   plusBadge: {
-    backgroundColor: '#FFD700',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -124,19 +123,16 @@ const styles = StyleSheet.create({
   },
   plusBadgeText: {
     fontSize: typography.micro,
-    color: '#000000',
     fontWeight: '600',
   },
   title: {
     fontSize: typography.h3,
-    color: '#FFFFFF',
     fontWeight: '600',
     marginBottom: 4,
     lineHeight: typography.h3 * typography.lineHeightTight,
   },
   instructor: {
     fontSize: typography.bodyMedium,
-    color: '#AAAAAA',
   },
 });
 

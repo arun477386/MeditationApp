@@ -19,7 +19,8 @@ enableScreens();
 const Drawer = createDrawerNavigator();
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   return (
     <Drawer.Navigator
@@ -28,7 +29,7 @@ export default function TabLayout() {
         headerShown: false,
         drawerStyle: {
           width: '80%',
-          backgroundColor: '#121212',
+          backgroundColor: theme.background,
         },
         drawerType: Platform.select({ ios: 'slide', android: 'front' }),
         overlayColor: Platform.select({ ios: 'transparent', android: 'rgba(0,0,0,0.5)' }),
@@ -40,11 +41,11 @@ export default function TabLayout() {
         {() => (
           <Tabs
             screenOptions={{
-              tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-              tabBarInactiveTintColor: '#FFFFFF',
+              tabBarActiveTintColor: theme.tabIconSelected,
+              tabBarInactiveTintColor: theme.tabIconDefault,
               headerShown: false,
               tabBarStyle: {
-                backgroundColor: '#121212',
+                backgroundColor: theme.background,
                 borderTopWidth: 0,
                 paddingVertical: 10,
               },

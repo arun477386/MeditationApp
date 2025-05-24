@@ -9,6 +9,8 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useFocusEffect } from '@react-navigation/native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface UserProfile {
   name?: string;
@@ -22,6 +24,8 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [lastFetchTimestamp, setLastFetchTimestamp] = useState(0);
   const isDrawerOpen = useDrawerStatus() === 'open';
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   // Debounced profile fetch function (minimum 5 seconds between fetches)
   const loadUserProfile = useCallback(async (force = false) => {
@@ -128,25 +132,23 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
   return (
     <ScrollView
-      style={[styles.container, {
-        paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : StatusBar.currentHeight || 0),
-      }]}
+      style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : StatusBar.currentHeight || 0) }]}
       showsVerticalScrollIndicator={false}
     >
       <TouchableOpacity style={styles.profileContainer} onPress={handleProfilePress}>
-        <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>{getAvatarLetter()}</Text>
+        <View style={[styles.avatarCircle, { backgroundColor: theme.accent }]}> 
+          <Text style={[styles.avatarText, { color: theme.background }]}>{getAvatarLetter()}</Text>
         </View>
         <View style={styles.profileTextContainer}>
-          <Text style={styles.nameText} numberOfLines={1} ellipsizeMode="tail">
+          <Text style={[styles.nameText, { color: theme.text }]} numberOfLines={1} ellipsizeMode="tail">
             {getDisplayName()}
           </Text>
-          <Text style={styles.viewProfile}>View Profile</Text>
+          <Text style={[styles.viewProfile, { color: theme.accent }]}>View Profile</Text>
         </View>
-        <Feather name="chevron-right" size={20} color="#666" style={styles.chevron} />
+        <Feather name="chevron-right" size={20} color={theme.textSecondary} style={styles.chevron} />
       </TouchableOpacity>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
       {drawerItems.map((item, index) => (
         <TouchableOpacity
@@ -154,8 +156,8 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           style={styles.itemRow}
           onPress={() => handleItemPress(item)}
         >
-          <Feather name={item.icon} size={22} color="#fff" style={styles.itemIcon} />
-          <Text style={styles.itemText}>{item.label}</Text>
+          <Feather name={item.icon} size={22} color={theme.icon} style={styles.itemIcon} />
+          <Text style={[styles.itemText, { color: theme.text }]}>{item.label}</Text>
         </TouchableOpacity>
       ))}
 
@@ -167,7 +169,6 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: '#121212' 
   },
   profileContainer: {
     flexDirection: 'row',
@@ -179,13 +180,11 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1DB954',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontSize: 24,
-    color: '#fff',
     fontWeight: '600',
   },
   profileTextContainer: {
@@ -195,13 +194,11 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: 20,
-    color: '#fff',
     fontWeight: '600',
     marginBottom: 2,
   },
   viewProfile: {
     fontSize: 14,
-    color: '#1DB954',
     fontWeight: '500',
   },
   chevron: { 
@@ -209,7 +206,6 @@ const styles = StyleSheet.create({
   },
   divider: { 
     height: 1, 
-    backgroundColor: '#333', 
     marginBottom: 12 
   },
   itemRow: {
@@ -224,7 +220,6 @@ const styles = StyleSheet.create({
   itemText: {
     marginLeft: 16,
     fontSize: 17,
-    color: '#fff',
     fontWeight: '400',
   },
 });

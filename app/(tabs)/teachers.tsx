@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { typography, elementSizes } from '../theme/sizes';
 import { Image } from '@/components/ui/Image';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 type RootDrawerParamList = {
   '(tabs)': undefined;
@@ -16,9 +18,10 @@ type TeachersScreenNavigationProp = DrawerNavigationProp<RootDrawerParamList, '(
 interface TeacherProfileProps {
   imageUrl: string;
   name: string;
+  theme: typeof Colors.light;
 }
 
-const TeacherProfile: React.FC<TeacherProfileProps> = ({ imageUrl, name }) => {
+const TeacherProfile: React.FC<TeacherProfileProps> = ({ imageUrl, name, theme }) => {
   const { width } = useWindowDimensions();
   const GRID_SPACING = 12;
   const ITEMS_PER_ROW = 4;
@@ -34,7 +37,7 @@ const TeacherProfile: React.FC<TeacherProfileProps> = ({ imageUrl, name }) => {
         contentFit="cover"
         fallbackSource={{ uri: 'https://randomuser.me/api/portraits/women/1.jpg' }}
       />
-      <Text style={styles.profileName} numberOfLines={1}>{name}</Text>
+      <Text style={[styles.profileName, { color: theme.text }]} numberOfLines={1}>{name}</Text>
     </View>
   );
 };
@@ -55,25 +58,28 @@ interface OptionItemProps {
   label: string;
   count?: string | number;
   onPress: () => void;
+  theme: typeof Colors.light;
 }
 
-const OptionItem: React.FC<OptionItemProps> = ({ icon, label, count, onPress }) => (
+const OptionItem: React.FC<OptionItemProps> = ({ icon, label, count, onPress, theme }) => (
   <TouchableOpacity style={styles.optionItem} onPress={onPress}>
     <View style={styles.optionContent}>
-      <Feather name={icon} size={24} color="#FFFFFF" style={styles.optionIcon} />
-      <Text style={styles.optionLabel}>{label}</Text>
+      <Feather name={icon} size={24} color={theme.icon} style={styles.optionIcon} />
+      <Text style={[styles.optionLabel, { color: theme.text }]}>{label}</Text>
     </View>
     <View style={styles.optionRight}>
       {count !== undefined && (
-        <Text style={styles.optionCount}>{count}</Text>
+        <Text style={[styles.optionCount, { color: theme.textSecondary }]}>{count}</Text>
       )}
-      <Feather name="chevron-right" size={24} color="#666666" />
+      <Feather name="chevron-right" size={24} color={theme.textSecondary} />
     </View>
   </TouchableOpacity>
 );
 
 export default function TeachersScreen() {
   const navigation = useNavigation<TeachersScreenNavigationProp>();
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
 
   const handleDrawerOpen = () => {
     navigation.openDrawer();
@@ -85,24 +91,24 @@ export default function TeachersScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Top Bar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { backgroundColor: theme.background }]}>
         <TouchableOpacity 
           style={styles.iconButton}
           onPress={handleDrawerOpen}
         >
-          <Feather name="menu" size={22} color="#FFFFFF" />
+          <Feather name="menu" size={22} color={theme.icon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton}>
-          <Feather name="search" size={22} color="#FFFFFF" />
+          <Feather name="search" size={22} color={theme.icon} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Text style={styles.title}>Teachers</Text>
-          <Text style={styles.subtitle}>{TEACHERS.length.toLocaleString()} of the world's best teachers.</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Teachers</Text>
+          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>{TEACHERS.length.toLocaleString()} of the world's best teachers.</Text>
         </View>
 
         <View style={styles.profileGrid}>
@@ -111,6 +117,7 @@ export default function TeachersScreen() {
               key={teacher.id}
               imageUrl={teacher.imageUrl}
               name={teacher.name}
+              theme={theme}
             />
           ))}
         </View>
@@ -120,24 +127,28 @@ export default function TeachersScreen() {
             icon="book"
             label="My Teachers"
             onPress={() => handleOptionPress('My Teachers')}
+            theme={theme}
           />
           <OptionItem
             icon="video"
             label="Live events"
             count="1,349"
             onPress={() => handleOptionPress('Live events')}
+            theme={theme}
           />
           <OptionItem
             icon="home"
             label="Retreats"
             count="305"
             onPress={() => handleOptionPress('Retreats')}
+            theme={theme}
           />
           <OptionItem
             icon="award"
             label="Challenges"
             count="Coming soon"
             onPress={() => handleOptionPress('Challenges')}
+            theme={theme}
           />
         </View>
       </ScrollView>
@@ -148,7 +159,6 @@ export default function TeachersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
   },
   topBar: {
     flexDirection: 'row',
@@ -171,14 +181,12 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
   },
   title: {
-    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '600',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    color: '#FFFFFF',
     fontSize: typography.bodyLarge,
     opacity: 0.8,
     textAlign: 'center',
@@ -199,10 +207,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   profileName: {
-    color: '#FFFFFF',
     fontSize: typography.bodySmall,
     textAlign: 'center',
-    paddingHorizontal: 2,
   },
   optionsContainer: {
     marginTop: 32,
@@ -224,7 +230,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   optionLabel: {
-    color: '#FFFFFF',
     fontSize: typography.bodyLarge,
   },
   optionRight: {
@@ -233,7 +238,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   optionCount: {
-    color: '#666666',
     fontSize: typography.bodyMedium,
   },
 }); 

@@ -144,12 +144,12 @@ export default function MainProfileScreen() {
       {/* Top Bar */}
       <View style={[styles.topBar, { backgroundColor: theme.background }]}>
         <TouchableOpacity 
-          style={[styles.iconButton, { backgroundColor: theme.card }]}
           onPress={handleDrawerOpen}
+          style={styles.iconButton}
         >
           <Feather name="menu" size={22} color={theme.text} />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.iconButton, { backgroundColor: theme.card }]}>
+        <TouchableOpacity style={styles.iconButton}>
           <Feather name="search" size={22} color={theme.text} />
         </TouchableOpacity>
       </View>
@@ -172,7 +172,7 @@ export default function MainProfileScreen() {
           <View style={styles.nameContainer}>
             <ThemedText style={[styles.name, { color: theme.text }]}>{profile?.name || user?.email || 'Guest'}</ThemedText>
             <TouchableOpacity 
-              style={[styles.editButton, { borderColor: theme.tint, backgroundColor: theme.card }]}
+              style={[styles.editButton, { borderColor: theme.tint }]}
               onPress={() => router.push('/profile')}
             >
               <Feather name="edit-2" size={16} color={theme.tint} />
@@ -195,20 +195,20 @@ export default function MainProfileScreen() {
           )}
         </View>
 
-        <View style={[styles.statsContainer, { borderColor: theme.border, backgroundColor: theme.card }]}>
+        <View style={[styles.statsContainer, { borderColor: theme.border }]}>
           {renderStatItem('calendar', profile?.meditationStreak || 0, 'Day Streak')}
           {renderStatItem('clock', profile?.totalSessions || 0, 'Sessions')}
           {renderStatItem('clock', profile?.totalMinutes || 0, 'Minutes')}
         </View>
 
         {profile?.about && (
-          <View style={[styles.section, { backgroundColor: theme.card }]}>
+          <View style={styles.section}>
             <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>About</ThemedText>
             <ThemedText style={[styles.aboutText, { color: theme.text }]}>{profile.about}</ThemedText>
           </View>
         )}
 
-        <View style={[styles.section, { backgroundColor: theme.card }]}>
+        <View style={styles.section}>
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>Account</ThemedText>
           <TouchableOpacity 
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
@@ -238,7 +238,7 @@ export default function MainProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card }]}>
+        <View style={styles.section}>
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>Activity</ThemedText>
           <TouchableOpacity 
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
@@ -319,6 +319,10 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: '#fff',
     fontWeight: '600',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+    lineHeight: 40,
   },
   nameContainer: {
     flexDirection: 'row',

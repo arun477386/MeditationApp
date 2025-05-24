@@ -208,7 +208,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { backgroundColor: theme.background }]}>
-        <TouchableOpacity onPress={handleBack} style={[styles.backButton, { backgroundColor: theme.card }]}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color={theme.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: theme.text }]}>Profile</Text>
@@ -305,7 +305,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          <View style={[styles.section, { backgroundColor: theme.card }]}>
+          <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Notifications</Text>
             <View style={[styles.preferenceItem, { borderBottomColor: theme.border }]}>
               <Text style={[styles.preferenceLabel, { color: theme.text }]}>Daily Reminder</Text>
