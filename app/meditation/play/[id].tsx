@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Audio } from 'expo-av';
 import { Feather } from '@expo/vector-icons';
@@ -31,22 +31,26 @@ export default function PlayScreen() {
   useEffect(() => {
     const fetchTrack = async () => {
       try {
-        const trackDoc = await getDoc(doc(db, 'tracks', id));
+        const meditationAppRef = doc(db, 'meditationApp', 'app');
+        const musicTracksRef = collection(meditationAppRef, 'musicTracks');
+        const trackDoc = await getDoc(doc(musicTracksRef, id));
+        
         if (trackDoc.exists()) {
           const data = trackDoc.data();
           setTrack({
             id: trackDoc.id,
             title: data.title,
-            author: data.author,
-            image: data.imageUrl || data.image || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167',
-            audio: data.audioUrl || data.audio,
-            duration: data.duration || '',
+            author: data.artistId, // We'll need to fetch the artist name separately if needed
+            image: data.coverUrl || data.image || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167',
+            audio: data.audioUrl,
+            duration: data.duration.toString(),
           });
         } else {
           Alert.alert('Error', 'Track not found');
           router.back();
         }
       } catch (error) {
+        console.error('Error fetching track:', error);
         Alert.alert('Error', 'Failed to load track');
         router.back();
       }

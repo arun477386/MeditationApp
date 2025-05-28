@@ -14,6 +14,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SignUpProvider } from '@/components/providers/SignUpProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from 'styled-components/native';
+import { Feather } from '@expo/vector-icons';
 import { TimerSettingsProvider } from '@/components/providers/TimerSettingsProvider';
 
 // Keep the splash screen visible while we fetch resources
@@ -24,6 +25,7 @@ export default function RootLayout() {
     PTSerif: require('../assets/fonts/PTSerif-Regular.ttf'),
     PTSerifBold: require('../assets/fonts/PTSerif-Bold.ttf'),
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    ...Feather.font,
   });
 
   const colorScheme = useColorScheme() ?? 'light';

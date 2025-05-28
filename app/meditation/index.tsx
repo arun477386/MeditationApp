@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, useWindowDimensions, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 
 interface Track {
@@ -129,36 +129,44 @@ export function MeditationScreen() {
     };
 
     const fetchTracks = async () => {
-      const querySnapshot = await getDocs(collection(db, 'tracks'));
-      const tracksList = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        // Get image URL with fallbacks
-        let imageUrl = data.image || data.thumbnailUrl || data.imageUrl;
+      try {
+        const meditationAppRef = doc(db, 'meditationApp', 'app');
+        const musicTracksRef = collection(meditationAppRef, 'musicTracks');
+        const querySnapshot = await getDocs(musicTracksRef);
         
-        // If the URL is a local file URI, use default image
-        if (!imageUrl || imageUrl.startsWith('file://')) {
-          imageUrl = 'https://randomuser.me/api/portraits/women/1.jpg';
-        }
+        const tracksList = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          // Get image URL with fallbacks
+          let imageUrl = data.coverUrl || data.image || data.thumbnailUrl || data.imageUrl;
+          
+          // If the URL is a local file URI, use default image
+          if (!imageUrl || imageUrl.startsWith('file://')) {
+            imageUrl = 'https://randomuser.me/api/portraits/women/1.jpg';
+          }
 
-        console.log('Track data from Firebase:', {
-          id: doc.id,
-          title: data.title,
-          imageUrl: imageUrl,
-          rawData: data
-        });
+          console.log('Track data from Firebase:', {
+            id: doc.id,
+            title: data.title,
+            imageUrl: imageUrl,
+            rawData: data
+          });
 
-        return {
-          id: doc.id,
-          title: data.title,
-          author: data.author,
-          rating: data.rating || 4.5,
-          type: data.type || 'Guided',
-          duration: data.duration,
-          image: imageUrl,
-        };
-      }) as Track[];
-      console.log('Processed tracks list:', tracksList);
-      setTracks(tracksList);
+          return {
+            id: doc.id,
+            title: data.title,
+            author: data.artistId, // We'll need to fetch the artist name separately if needed
+            rating: data.rating || 4.5,
+            type: data.type || 'Guided',
+            duration: data.duration.toString(),
+            image: imageUrl,
+          };
+        }) as Track[];
+        console.log('Processed tracks list:', tracksList);
+        setTracks(tracksList);
+      } catch (error) {
+        console.error('Error fetching tracks:', error);
+        Alert.alert('Error', 'Failed to load tracks');
+      }
     };
 
     fetchTeachers();
