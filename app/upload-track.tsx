@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage, auth } from '@/services/firebase';
 import * as ImagePicker from 'expo-image-picker';
@@ -57,15 +57,26 @@ export default function UploadTrackScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        // Validate image size
-        const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri);
-        if (fileInfo.exists && 'size' in fileInfo && fileInfo.size > 2 * 1024 * 1024) { // 2MB limit
-          Alert.alert('Error', 'Image size should be less than 2MB');
-          return;
+        if (Platform.OS === 'web') {
+          // Web platform handling
+          const file = result.assets[0];
+          const fileSize = file.fileSize || 0; // Use fileSize property for web
+          if (fileSize > 2 * 1024 * 1024) { // 2MB limit
+            Alert.alert('Error', 'Image size should be less than 2MB');
+            return;
+          }
+          setForm(prev => ({ ...prev, image: file.uri }));
+          setImageName(file.uri.split('/').pop() || 'Image uploaded');
+        } else {
+          // Mobile platform handling
+          const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri);
+          if (fileInfo.exists && 'size' in fileInfo && fileInfo.size > 2 * 1024 * 1024) { // 2MB limit
+            Alert.alert('Error', 'Image size should be less than 2MB');
+            return;
+          }
+          setForm(prev => ({ ...prev, image: result.assets[0].uri }));
+          setImageName(result.assets[0].uri.split('/').pop() || 'Image uploaded');
         }
-
-        setForm(prev => ({ ...prev, image: result.assets[0].uri }));
-        setImageName(result.assets[0].uri.split('/').pop() || 'Image uploaded');
       }
     } catch (error) {
       console.error('Image picker error:', error);
@@ -81,15 +92,26 @@ export default function UploadTrackScreen() {
       });
 
       if (result.assets && result.assets.length > 0) {
-        // Validate audio size
-        const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri);
-        if (fileInfo.exists && 'size' in fileInfo && fileInfo.size > 10 * 1024 * 1024) { // 10MB limit
-          Alert.alert('Error', 'Audio file size should be less than 10MB');
-          return;
+        if (Platform.OS === 'web') {
+          // Web platform handling
+          const file = result.assets[0];
+          const fileSize = file.size || 0; // Use size property for document picker
+          if (fileSize > 10 * 1024 * 1024) { // 10MB limit
+            Alert.alert('Error', 'Audio file size should be less than 10MB');
+            return;
+          }
+          setForm(prev => ({ ...prev, audio: file.uri }));
+          setAudioName(file.name || 'Audio uploaded');
+        } else {
+          // Mobile platform handling
+          const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri);
+          if (fileInfo.exists && 'size' in fileInfo && fileInfo.size > 10 * 1024 * 1024) { // 10MB limit
+            Alert.alert('Error', 'Audio file size should be less than 10MB');
+            return;
+          }
+          setForm(prev => ({ ...prev, audio: result.assets[0].uri }));
+          setAudioName(result.assets[0].name || 'Audio uploaded');
         }
-
-        setForm(prev => ({ ...prev, audio: result.assets[0].uri }));
-        setAudioName(result.assets[0].name || 'Audio uploaded');
       }
     } catch (error) {
       console.error('Audio picker error:', error);
@@ -113,72 +135,150 @@ export default function UploadTrackScreen() {
       // Upload image
       let imageUrl;
       try {
-        const imageInfo = await FileSystem.getInfoAsync(form.image);
-        if (!imageInfo.exists) {
-          throw new Error('Image file not found');
+        if (Platform.OS === 'web') {
+          // Web platform handling
+          const response = await fetch(form.image);
+          if (!response.ok) {
+            throw new Error('Failed to fetch image file');
+          }
+          const blob = await response.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('Invalid image file');
+          }
+          if (blob.size > 2 * 1024 * 1024) {
+            throw new Error('Image size should be less than 2MB');
+          }
+        } else {
+          // Mobile platform handling
+          const imageInfo = await FileSystem.getInfoAsync(form.image);
+          if (!imageInfo.exists) {
+            throw new Error('Image file not found');
+          }
+          if (imageInfo.size > 2 * 1024 * 1024) {
+            throw new Error('Image size should be less than 2MB');
+          }
         }
 
         const imageStorageRef = ref(
           storage,
-          `tracks/images/${Date.now()}-${imageName || 'image.jpg'}`
+          `meditationApp/tracks/images/${Date.now()}-${imageName || 'image.jpg'}`
         );
 
         // Create a fetch request to get the file
         const response = await fetch(form.image);
-        const blob = await response.blob();
+        if (!response.ok) {
+          throw new Error('Failed to fetch image file');
+        }
         
-        await uploadBytes(imageStorageRef, blob);
-        imageUrl = await getDownloadURL(imageStorageRef);
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+          throw new Error('Invalid image file');
+        }
+        
+        // Upload with metadata
+        const metadata = {
+          contentType: 'image/jpeg',
+          customMetadata: {
+            uploadedAt: Date.now().toString(),
+            originalSize: blob.size.toString(),
+            fileType: 'image',
+            uploadedBy: currentUser.uid
+          }
+        };
+
+        const uploadResult = await uploadBytes(imageStorageRef, blob, metadata);
+        imageUrl = await getDownloadURL(uploadResult.ref);
+        
+        if (!imageUrl) {
+          throw new Error('Failed to get download URL for image');
+        }
       } catch (error: any) {
         console.error('Image upload error:', error);
-        throw new Error('Failed to upload image. Please try again.');
+        throw new Error(error.message || 'Failed to upload image. Please try again.');
       }
 
       // Upload audio
       let audioUrl;
       try {
-        const audioInfo = await FileSystem.getInfoAsync(form.audio);
-        if (!audioInfo.exists) {
-          throw new Error('Audio file not found');
+        if (Platform.OS === 'web') {
+          // Web platform handling
+          const response = await fetch(form.audio);
+          if (!response.ok) {
+            throw new Error('Failed to fetch audio file');
+          }
+          const blob = await response.blob();
+          if (!blob || blob.size === 0) {
+            throw new Error('Invalid audio file');
+          }
+          if (blob.size > 10 * 1024 * 1024) {
+            throw new Error('Audio file size should be less than 10MB');
+          }
+        } else {
+          // Mobile platform handling
+          const audioInfo = await FileSystem.getInfoAsync(form.audio);
+          if (!audioInfo.exists) {
+            throw new Error('Audio file not found');
+          }
+          if (audioInfo.size > 10 * 1024 * 1024) {
+            throw new Error('Audio file size should be less than 10MB');
+          }
         }
 
         const audioStorageRef = ref(
           storage,
-          `tracks/audio/${Date.now()}-${audioName || 'audio.mp3'}`
+          `meditationApp/tracks/audio/${Date.now()}-${audioName || 'audio.mp3'}`
         );
 
         // Create a fetch request to get the file
         const response = await fetch(form.audio);
-        const blob = await response.blob();
+        if (!response.ok) {
+          throw new Error('Failed to fetch audio file');
+        }
         
-        await uploadBytes(audioStorageRef, blob);
-        audioUrl = await getDownloadURL(audioStorageRef);
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+          throw new Error('Invalid audio file');
+        }
+        
+        // Upload with metadata
+        const metadata = {
+          contentType: 'audio/mpeg',
+          customMetadata: {
+            uploadedAt: Date.now().toString(),
+            originalSize: blob.size.toString(),
+            fileType: 'audio',
+            uploadedBy: currentUser.uid
+          }
+        };
+
+        const uploadResult = await uploadBytes(audioStorageRef, blob, metadata);
+        audioUrl = await getDownloadURL(uploadResult.ref);
+        
+        if (!audioUrl) {
+          throw new Error('Failed to get download URL for audio');
+        }
       } catch (error: any) {
         console.error('Audio upload error:', error);
-        throw new Error('Failed to upload audio. Please try again.');
+        throw new Error(error.message || 'Failed to upload audio. Please try again.');
       }
 
       // Create track document
-      const tracksRef = collection(db, 'tracks');
       const trackData = {
+        trackId: Date.now().toString(), // Generate a unique ID
         title: form.title.trim(),
-        author: form.author.trim(),
-        type: form.type,
-        duration: form.duration.trim(),
-        imageUrl,
-        audioUrl,
-        rating: 4.5,
-        totalRatings: 0,
-        totalPlays: 0,
-        uploadedBy: currentUser.uid,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        isPublished: true,
+        artistId: currentUser.uid,
+        duration: parseInt(form.duration.trim()) || 0,
         tags: [],
-        category: 'meditation'
+        audioUrl,
+        coverUrl: imageUrl,
+        createdAt: serverTimestamp(),
       };
 
-      await addDoc(tracksRef, trackData);
+      // Add to meditationApp collection with musicTracks subcollection
+      const meditationAppRef = doc(db, 'meditationApp', 'app');
+      const musicTracksRef = collection(meditationAppRef, 'musicTracks');
+      await addDoc(musicTracksRef, trackData);
+
       Alert.alert('Success', 'Track uploaded successfully!');
       router.back();
     } catch (error: any) {

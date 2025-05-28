@@ -18,9 +18,15 @@ export interface User {
   timezone: string;
   createdAt: Date;
   preferences: UserPreferences;
+  meditationStreak: number;
+  totalSessions: number;
+  totalMinutes: number;
+  app: string; // Reference to MeditationApp document
+  role: 'user' | 'admin'; // User role for access control
 }
 
 export interface MeditationSession {
+  sessionId: string;
   userId: string;
   durationMinutes: number;
   startedAt: Date;
@@ -34,6 +40,7 @@ export interface MeditationSession {
 }
 
 export interface GratitudeEntry {
+  entryId: string;
   userId: string;
   text: string;
   createdAt: Date;
@@ -42,6 +49,7 @@ export interface GratitudeEntry {
 }
 
 export interface DailyGoal {
+  goalId: string;
   userId: string;
   goalTitle: string;
   description: string;
@@ -51,6 +59,7 @@ export interface DailyGoal {
 }
 
 export interface CommunityPost {
+  postId: string;
   userId: string;
   content: string;
   imageUrl: string;
@@ -64,6 +73,7 @@ export interface CommunityPost {
 }
 
 export interface Notification {
+  notificationId: string;
   userId: string;
   message: string;
   read: boolean;
@@ -72,6 +82,7 @@ export interface Notification {
 }
 
 export interface Friendship {
+  friendshipId: string;
   requesterId: string;
   receiverId: string;
   status: 'pending' | 'accepted' | 'rejected';
@@ -79,6 +90,7 @@ export interface Friendship {
 }
 
 export interface CheckIn {
+  checkInId: string;
   userId: string;
   date: string;
   mood: 'happy' | 'neutral' | 'sad';
@@ -109,11 +121,12 @@ export interface Course {
 }
 
 export interface CourseEnrollment {
+  enrollmentId: string;
   userId: string;
   courseId: string;
   enrolledAt: Date;
   completedLessons: string[];
-  progress: number; // Percentage of course completed
+  progress: number;
   lastAccessedAt: Date;
   status: 'active' | 'completed' | 'dropped';
 }
@@ -142,6 +155,7 @@ export interface MusicTrack {
 }
 
 export interface Playlist {
+  playlistId: string;
   userId: string;
   title: string;
   description: string;
@@ -160,6 +174,7 @@ export interface LiveEvent {
 }
 
 export interface EventRegistration {
+  registrationId: string;
   userId: string;
   eventId: string;
   registeredAt: Date;
@@ -246,4 +261,23 @@ export interface TeacherRating {
   updatedAt: Date;
   helpfulVotes: number;
   isVerifiedStudent: boolean;
+}
+
+export interface MeditationApp {
+  courses: Record<string, Course>;
+  musicTracks: Record<string, MusicTrack>;
+  liveEvents: Record<string, LiveEvent>;
+  teachers: Record<string, Teacher>;
+  checkIns: Record<string, CheckIn>;
+  meditationSessions: Record<string, MeditationSession>;
+  gratitudeEntries: Record<string, GratitudeEntry>;
+  dailyGoals: Record<string, DailyGoal>;
+  communityPosts: Record<string, CommunityPost>;
+  notifications: Record<string, Notification>;
+  friendships: Record<string, Friendship>;
+  courseEnrollments: Record<string, CourseEnrollment>;
+  courseRatings: Record<string, CourseRating>;
+  playlists: Record<string, Playlist>;
+  eventRegistrations: Record<string, EventRegistration>;
+  teacherRatings: Record<string, TeacherRating>;
 } 

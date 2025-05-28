@@ -33,6 +33,7 @@ export const authService = {
         createdAt: serverTimestamp(),
         isTeacher: false, // Default to false
         teacherProfileId: null, // Reference to teacher profile if they become a teacher
+        app: 'MeditationApp', // Default app assignment
         preferences: {
           theme: 'dark',
           language: 'en',
@@ -41,7 +42,8 @@ export const authService = {
             friendRequests: true,
             courseUpdates: true
           }
-        }
+        },
+        role: 'user' // Default role for new users
       });
 
       return user;
@@ -88,6 +90,7 @@ export const authService = {
             createdAt: serverTimestamp(),
             isTeacher: false, // Default to false
             teacherProfileId: null, // Reference to teacher profile if they become a teacher
+            app: 'MeditationApp', // Default app assignment
             preferences: {
               theme: 'dark',
               language: 'en',
@@ -96,7 +99,8 @@ export const authService = {
                 friendRequests: true,
                 courseUpdates: true
               }
-            }
+            },
+            role: 'user' // Default role for new users
           });
         }
 

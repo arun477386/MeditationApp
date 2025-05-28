@@ -16,10 +16,10 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc, updateDoc, arrayUnion, increment } from 'firebase/firestore';
 import { db, auth } from '@/services/firebase';
-import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import CrossPlatformMapView from './components/CrossPlatformMapView';
 
 interface EventData {
   id: string;
@@ -280,30 +280,11 @@ export default function EventProfileScreen() {
           <Text style={[styles.description, { color: theme.text }]}>{event.description}</Text>
 
           {event.coordinates && (
-            <TouchableOpacity style={styles.mapContainer} onPress={handleOpenMap}>
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: event.coordinates.latitude,
-                  longitude: event.coordinates.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-                pointerEvents="none"
-              >
-                <Marker
-                  coordinate={{
-                    latitude: event.coordinates.latitude,
-                    longitude: event.coordinates.longitude,
-                  }}
-                />
-              </MapView>
-              <View style={styles.mapOverlay}>
-                <Text style={styles.mapOverlayText}>Tap to open in Maps</Text>
-              </View>
-            </TouchableOpacity>
+            <CrossPlatformMapView
+              coordinates={event.coordinates}
+              title={event.title}
+              onPress={handleOpenMap}
+            />
           )}
 
           {event.onlineLink && (
@@ -404,29 +385,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     marginBottom: 24,
-  },
-  mapContainer: {
-    height: 200,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  mapOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mapOverlayText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 8,
-    borderRadius: 8,
   },
   onlineButton: {
     padding: 16,
