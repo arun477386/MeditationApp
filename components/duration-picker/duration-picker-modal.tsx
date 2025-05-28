@@ -1,8 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle, ScrollView } from 'react-native';
 import { useColorScheme, useWindowDimensions } from 'react-native';
-import ScrollPicker from 'react-native-wheel-scrollview-picker';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import ScrollPicker from 'react-native-wheel-scrollview-picker';
 
 export interface DurationPickerModalProps {
   isVisible: boolean;
@@ -15,38 +15,10 @@ const SELECTED_BG = 'rgba(40,40,40,0.8)';
 const SELECTED_TEXT = '#fff';
 const UNSELECTED_TEXT = '#888';
 
-function renderPickerItem(selectedIndex: number) {
-  return function PickerItem(props: any) {
-    const { item, index } = props;
-    if (!item) return <View />;
-    const isSelected = index === selectedIndex;
-    return (
-      <View
-        style={{
-          height: 40,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 12,
-          backgroundColor: isSelected ? SELECTED_BG : 'transparent',
-          marginVertical: 2,
-          minWidth: 48,
-          paddingHorizontal: 8,
-        } as ViewStyle}
-      >
-        <Text
-          style={{
-            color: isSelected ? SELECTED_TEXT : UNSELECTED_TEXT,
-            fontWeight: isSelected ? 'bold' : '400',
-            fontSize: 24,
-            opacity: isSelected ? 1 : 0.6,
-            letterSpacing: 1,
-          } as TextStyle}
-        >
-          {item.label}
-        </Text>
-      </View>
-    );
-  };
+// Type for picker data
+interface PickerData {
+  value: string;
+  label: string;
 }
 
 export function DurationPickerModal({
@@ -59,6 +31,7 @@ export function DurationPickerModal({
   const [minutes, setMinutes] = React.useState(initialDuration.minutes);
   const [seconds, setSeconds] = React.useState(initialDuration.seconds);
   const [hasChanged, setHasChanged] = React.useState(false);
+  const [selectedWarmup, setSelectedWarmup] = React.useState(0);
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
 
@@ -83,6 +56,25 @@ export function DurationPickerModal({
     }
   }
 
+  // Generate typed arrays for picker data
+  const hoursData: PickerData[] = Array.from({ length: 24 }, (_, i) => ({
+    value: i.toString().padStart(2, '0'),
+    label: i.toString().padStart(2, '0')
+  }));
+  
+  const minutesData: PickerData[] = Array.from({ length: 60 }, (_, i) => ({
+    value: i.toString().padStart(2, '0'),
+    label: i.toString().padStart(2, '0')
+  }));
+  
+  const secondsData: PickerData[] = Array.from({ length: 60 }, (_, i) => ({
+    value: i.toString().padStart(2, '0'),
+    label: i.toString().padStart(2, '0')
+  }));
+
+  // Generate warmup options
+  const warmupOptions = Array.from({ length: 31 }, (_, i) => i);
+
   return (
     <Modal visible={isVisible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={pickerModalStyles.overlay}>
@@ -106,6 +98,7 @@ export function DurationPickerModal({
             <View style={{ width: 60 }} />
           )}
         </View>
+
         {/* Infinity button below Save, right-aligned */}
         {hasChanged && (
           <View style={pickerModalStyles.infinityRowBelowHeader}>
@@ -114,67 +107,98 @@ export function DurationPickerModal({
             </TouchableOpacity>
           </View>
         )}
+
         {/* Transparent modal container, pickers are centered and transparent */}
         <View style={[pickerModalStyles.modalContainer, { width: width, backgroundColor: 'transparent', justifyContent: 'center', flex: 1 }]}> 
           <View style={pickerModalStyles.pickerRow}>
             {/* Hours Picker */}
             <View style={pickerModalStyles.pickerColTransparent}>
               <ScrollPicker
-                dataSource={[...Array(24).keys()].map(i => i.toString().padStart(2, '0'))}
+                dataSource={hoursData}
                 selectedIndex={hours}
-                renderItem={(data, index, isSelected) => (
-                  <View style={isSelected ? pickerModalStyles.slotSelected : pickerModalStyles.slotUnselected}>
-                    <Text style={isSelected ? pickerModalStyles.slotSelectedText : pickerModalStyles.slotUnselectedText}>{data}</Text>
+                renderItem={(data: PickerData, index: number, isSelected: boolean) => (
+                  <View style={[
+                    pickerModalStyles.slotContainer,
+                    isSelected && pickerModalStyles.slotSelected
+                  ]}>
+                    <Text style={[
+                      pickerModalStyles.slotText,
+                      isSelected && pickerModalStyles.slotSelectedText
+                    ]}>
+                      {data.label}
+                    </Text>
                   </View>
                 )}
-                onValueChange={(data, selectedIndex) => handleTimeChange('h', selectedIndex)}
+                onValueChange={(data: PickerData, selectedIndex: number) => handleTimeChange('h', selectedIndex)}
                 wrapperHeight={180}
-                wrapperBackground={'transparent'}
+                wrapperWidth={80}
+                wrapperBackground="#00000000"
                 itemHeight={40}
-                highlightColor={'rgba(40,40,40,0.8)'}
+                highlightColor="#00000000"
                 highlightBorderWidth={0}
               />
               <Text style={pickerModalStyles.unit}>h</Text>
             </View>
+
             {/* Minutes Picker */}
             <View style={pickerModalStyles.pickerColTransparent}>
               <ScrollPicker
-                dataSource={[...Array(60).keys()].map(i => i.toString().padStart(2, '0'))}
+                dataSource={minutesData}
                 selectedIndex={minutes}
-                renderItem={(data, index, isSelected) => (
-                  <View style={isSelected ? pickerModalStyles.slotSelected : pickerModalStyles.slotUnselected}>
-                    <Text style={isSelected ? pickerModalStyles.slotSelectedText : pickerModalStyles.slotUnselectedText}>{data}</Text>
+                renderItem={(data: PickerData, index: number, isSelected: boolean) => (
+                  <View style={[
+                    pickerModalStyles.slotContainer,
+                    isSelected && pickerModalStyles.slotSelected
+                  ]}>
+                    <Text style={[
+                      pickerModalStyles.slotText,
+                      isSelected && pickerModalStyles.slotSelectedText
+                    ]}>
+                      {data.label}
+                    </Text>
                   </View>
                 )}
-                onValueChange={(data, selectedIndex) => handleTimeChange('m', selectedIndex)}
+                onValueChange={(data: PickerData, selectedIndex: number) => handleTimeChange('m', selectedIndex)}
                 wrapperHeight={180}
-                wrapperBackground={'transparent'}
+                wrapperWidth={80}
+                wrapperBackground="#00000000"
                 itemHeight={40}
-                highlightColor={'rgba(40,40,40,0.8)'}
+                highlightColor="#00000000"
                 highlightBorderWidth={0}
               />
               <Text style={pickerModalStyles.unit}>m</Text>
             </View>
+
             {/* Seconds Picker */}
             <View style={pickerModalStyles.pickerColTransparent}>
               <ScrollPicker
-                dataSource={[...Array(60).keys()].map(i => i.toString().padStart(2, '0'))}
+                dataSource={secondsData}
                 selectedIndex={seconds}
-                renderItem={(data, index, isSelected) => (
-                  <View style={isSelected ? pickerModalStyles.slotSelected : pickerModalStyles.slotUnselected}>
-                    <Text style={isSelected ? pickerModalStyles.slotSelectedText : pickerModalStyles.slotUnselectedText}>{data}</Text>
+                renderItem={(data: PickerData, index: number, isSelected: boolean) => (
+                  <View style={[
+                    pickerModalStyles.slotContainer,
+                    isSelected && pickerModalStyles.slotSelected
+                  ]}>
+                    <Text style={[
+                      pickerModalStyles.slotText,
+                      isSelected && pickerModalStyles.slotSelectedText
+                    ]}>
+                      {data.label}
+                    </Text>
                   </View>
                 )}
-                onValueChange={(data, selectedIndex) => handleTimeChange('s', selectedIndex)}
+                onValueChange={(data: PickerData, selectedIndex: number) => handleTimeChange('s', selectedIndex)}
                 wrapperHeight={180}
-                wrapperBackground={'transparent'}
+                wrapperWidth={80}
+                wrapperBackground="#00000000"
                 itemHeight={40}
-                highlightColor={'rgba(40,40,40,0.8)'}
+                highlightColor="#00000000"
                 highlightBorderWidth={0}
               />
               <Text style={pickerModalStyles.unit}>s</Text>
             </View>
           </View>
+
           {/* Meditation dropdown */}
           <View style={pickerModalStyles.meditationRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -182,19 +206,31 @@ export function DurationPickerModal({
               <Ionicons name="chevron-down" size={24} color="#fff" style={{ marginLeft: 4, marginTop: 2 }} />
             </View>
           </View>
+
           {/* Warm Up options - horizontally scrollable, more margin top */}
           <View style={[pickerModalStyles.warmupRow, { marginTop: 48 }]}> 
             <Text style={pickerModalStyles.warmupLabel}>Warm Up</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 8 }}>
-              {[...Array(31).keys()].map((sec) => (
-                <View
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              contentContainerStyle={pickerModalStyles.warmupScrollContent}
+            >
+              {warmupOptions.map((sec) => (
+                <TouchableOpacity
                   key={sec}
-                  style={sec === 0 ? pickerModalStyles.warmupSelected : pickerModalStyles.warmupOption}
+                  onPress={() => setSelectedWarmup(sec)}
+                  style={[
+                    pickerModalStyles.warmupOption,
+                    sec === selectedWarmup && pickerModalStyles.warmupSelected
+                  ]}
                 >
-                  <Text style={sec === 0 ? pickerModalStyles.warmupSelectedText : pickerModalStyles.warmupOptionText}>
+                  <Text style={[
+                    pickerModalStyles.warmupOptionText,
+                    sec === selectedWarmup && pickerModalStyles.warmupSelectedText
+                  ]}>
                     {sec}s
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
@@ -254,20 +290,26 @@ const pickerModalStyles = StyleSheet.create({
     paddingVertical: 8,
     width: 80,
   },
-  wheel: {
-    width: 70,
-    height: 180,
-    backgroundColor: 'transparent',
+  slotContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  wheelItem: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '400',
-  },
-  selectedIndicator: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+  slotSelected: {
+    backgroundColor: SELECTED_BG,
     borderRadius: 8,
-    height: 40,
+  },
+  slotText: {
+    color: UNSELECTED_TEXT,
+    fontSize: 24,
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+  slotSelectedText: {
+    color: SELECTED_TEXT,
+    fontWeight: '600',
   },
   unit: {
     color: '#fff',
@@ -322,11 +364,9 @@ const pickerModalStyles = StyleSheet.create({
     marginBottom: 8,
     fontWeight: '500',
   },
-  warmupOptionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  warmupScrollContent: {
     alignItems: 'center',
-    gap: 16,
+    paddingHorizontal: 8,
   },
   warmupOption: {
     borderColor: '#888',
@@ -353,36 +393,5 @@ const pickerModalStyles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  slotSelected: {
-    backgroundColor: 'rgba(40,40,40,0.8)',
-    borderRadius: 12,
-    minWidth: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-    marginVertical: 2,
-  },
-  slotSelectedText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 24,
-    letterSpacing: 1,
-  },
-  slotUnselected: {
-    backgroundColor: 'transparent',
-    borderRadius: 12,
-    minWidth: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-    marginVertical: 2,
-  },
-  slotUnselectedText: {
-    color: '#888',
-    fontWeight: '400',
-    fontSize: 20,
-    opacity: 0.6,
-    letterSpacing: 1,
   },
 });

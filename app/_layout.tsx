@@ -15,6 +15,7 @@ import { SignUpProvider } from '@/components/providers/SignUpProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from 'styled-components/native';
 import { Feather } from '@expo/vector-icons';
+import { TimerSettingsProvider } from '@/components/providers/TimerSettingsProvider';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -69,32 +70,34 @@ export default function RootLayout() {
           translucent={true}
         />
         <BottomSheetModalProvider>
-          <ThemeProvider theme={theme}>
-            <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <AuthProvider>
-                <SignUpProvider>
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      headerStyle: {
-                        backgroundColor: theme.background,
-                      },
-                      headerTintColor: theme.text,
-                    }}
-                  >
-                    <Stack.Screen 
-                      name="(drawer)" 
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen 
-                      name="+not-found" 
-                      options={{ headerShown: false }}
-                    />
-                  </Stack>
-                </SignUpProvider>
-              </AuthProvider>
-            </NavigationThemeProvider>
-          </ThemeProvider>
+          <TimerSettingsProvider>
+            <ThemeProvider theme={theme}>
+              <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <AuthProvider>
+                  <SignUpProvider>
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                        headerStyle: {
+                          backgroundColor: theme.background,
+                        },
+                        headerTintColor: theme.text,
+                      }}
+                    >
+                      <Stack.Screen 
+                        name="(drawer)" 
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen 
+                        name="+not-found" 
+                        options={{ headerShown: false }}
+                      />
+                    </Stack>
+                  </SignUpProvider>
+                </AuthProvider>
+              </NavigationThemeProvider>
+            </ThemeProvider>
+          </TimerSettingsProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
