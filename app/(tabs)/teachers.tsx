@@ -105,7 +105,7 @@ export default function TeachersScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      {/* <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: theme.text }]}>Teachers</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>{TEACHERS.length.toLocaleString()} of the world's best teachers.</Text>
@@ -151,7 +151,7 @@ export default function TeachersScreen() {
             theme={theme}
           />
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </SafeAreaView>
   );
 }

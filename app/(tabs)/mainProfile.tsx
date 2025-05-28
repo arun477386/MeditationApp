@@ -240,14 +240,14 @@ export default function MainProfileScreen() {
 
         <View style={styles.section}>
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>Activity</ThemedText>
-          <TouchableOpacity 
+          {/* <TouchableOpacity 
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
             onPress={() => router.push('/library')}
           >
             <Feather name="book" size={24} color={theme.icon} />
             <ThemedText style={[styles.menuItemText, { color: theme.text }]}>Library</ThemedText>
             <Feather name="chevron-right" size={24} color={theme.icon} style={styles.chevron} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           
           <TouchableOpacity 
             style={[styles.menuItem, { borderBottomColor: theme.border }]}

@@ -86,7 +86,7 @@ export default function LibraryScreen() {
             onPress={() => router.push('/events' as any)}
             theme={theme}
           />
-          <CategoryItem
+          {/* <CategoryItem
             icon={<Ionicons name="sunny-outline" size={28} color={theme.icon} />}
             label="Mornings"
             theme={theme}
@@ -105,21 +105,25 @@ export default function LibraryScreen() {
             icon={<Ionicons name="musical-notes-outline" size={28} color={theme.icon} />}
             label="Music"
             theme={theme}
-          />
+          /> */}
           <CategoryItem
             icon={<Ionicons name="school-outline" size={28} color={theme.icon} />}
             label="Courses"
             count={9}
             theme={theme}
           />
-          <CategoryItem
+          {/* <CategoryItem
             icon={<Ionicons name="trophy-outline" size={28} color={theme.icon} />}
             label="Challenges"
             theme={theme}
-          />
+          /> */}
         </View>
 
-        <View style={styles.coursesSection}>
+
+
+
+
+        {/* <View style={styles.coursesSection}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>Courses for you</Text>
           <ScrollView 
             horizontal 
@@ -140,10 +144,10 @@ export default function LibraryScreen() {
               instructor="Olivia Johnson"
             />
           </ScrollView>
-        </View>
+        </View> */}
 
         {/* Topics Section */}
-        <View style={styles.topicsSection}>
+        {/* <View style={styles.topicsSection}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>Topics</Text>
           <View style={styles.topicsGrid}>
             {TOPICS.map((topic, index) => (
@@ -155,10 +159,14 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </View> */}
+
+
+
+        
 
         {/* Get Started Section */}
-        <View style={styles.getStartedSection}>
+        {/* <View style={styles.getStartedSection}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>Get started</Text>
           <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>A personalized selection to get you started.</Text>
           <ScrollView 
@@ -182,10 +190,13 @@ export default function LibraryScreen() {
               imageUrl="https://example.com/meditation-advanced.jpg"
             />
           </ScrollView>
-        </View>
+        </View> */}
+
+
+
 
         {/* 3 Mins For You Section */}
-        <View style={styles.shortMeditationsSection}>
+        {/* <View style={styles.shortMeditationsSection}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>3 mins for you</Text>
           <ScrollView 
             horizontal 
@@ -203,7 +214,7 @@ export default function LibraryScreen() {
               duration={3}
             />
           </ScrollView>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );

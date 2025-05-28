@@ -275,7 +275,7 @@ export default function UploadTrackScreen() {
       };
 
       // Add to meditationApp collection with musicTracks subcollection
-      const meditationAppRef = doc(db, 'meditationApp', 'app');
+      const meditationAppRef = doc(db, 'meditationApp');
       const musicTracksRef = collection(meditationAppRef, 'musicTracks');
       await addDoc(musicTracksRef, trackData);
 

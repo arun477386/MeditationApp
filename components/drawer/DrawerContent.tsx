@@ -91,14 +91,14 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const drawerItems = [
     ...(user ? [] : [{ label: 'Sign up', icon: 'user' as const, action: handleSignUp }]),
     { label: 'Check In', icon: 'check-circle' as const, route: 'checkin' },
-    { label: 'Membership', icon: 'star' as const, route: 'membership' },
-    { label: 'Journal', icon: 'monitor' as const, route: 'journal' },
-    { label: 'Notifications', icon: 'bell' as const, route: 'notifications' },
-    { label: 'Friends', icon: 'users' as const, route: 'friends' },
-    { label: 'Groups', icon: 'users' as const, route: 'groups' },
-    { label: 'Invite a friend', icon: 'user-plus' as const, route: 'invite' },
-    { label: 'Help', icon: 'help-circle' as const, route: 'help' },
-    { label: 'Settings', icon: 'settings' as const, route: 'settings' },
+    // { label: 'Membership', icon: 'star' as const, route: 'membership' },
+    // { label: 'Journal', icon: 'monitor' as const, route: 'journal' },
+    // { label: 'Notifications', icon: 'bell' as const, route: 'notifications' },
+    // { label: 'Friends', icon: 'users' as const, route: 'friends' },
+    // { label: 'Groups', icon: 'users' as const, route: 'groups' },
+    // { label: 'Invite a friend', icon: 'user-plus' as const, route: 'invite' },
+    // { label: 'Help', icon: 'help-circle' as const, route: 'help' },
+    // { label: 'Settings', icon: 'settings' as const, route: 'settings' },
   ];
 
   function handleSignUp() {

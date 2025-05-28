@@ -29,6 +29,18 @@ export default function CreateTeacherScreen() {
       return;
     }
 
+    // Check if user is admin
+    const checkAdminRole = async () => {
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser!.uid));
+      if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+        Alert.alert('Error', 'Only administrators can create teacher profiles.');
+        router.back();
+        return;
+      }
+    };
+
+    checkAdminRole();
+
     // Check if user already has a teacher profile
     const checkExistingProfile = async () => {
       const userDoc = await getDoc(doc(db, 'users', auth.currentUser!.uid));
@@ -84,6 +96,14 @@ export default function CreateTeacherScreen() {
         throw new Error('You must be logged in to create a teacher profile');
       }
 
+      // Verify admin role again before creating teacher profile
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+        Alert.alert('Error', 'Only administrators can create teacher profiles.');
+        setIsSaving(false);
+        return;
+      }
+
       // Upload profile image if selected
       let profilePicUrl = '';
       if (form.profilePic) {
@@ -130,16 +150,31 @@ export default function CreateTeacherScreen() {
       };
 
       // Add teacher profile to Firestore
-      const teacherRef = doc(db, 'teachers', currentUser.uid);
-      await updateDoc(teacherRef, teacherData);
+      // const teacherRef = doc(db, 'teachers', currentUser.uid);
+      // await updateDoc(teacherRef, teacherData);
 
-      // Update user document to mark as teacher
+
+      const meditationAppRef = doc(db, 'meditationApp');
+      const teachersRef = collection(meditationAppRef, 'teachers');
+      await addDoc(teachersRef, teacherData);
+
+     
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         isTeacher: true,
         teacherProfileId: currentUser.uid,
         updatedAt: serverTimestamp()
-      });
+      });
+
+
+
+      // Update user document to mark as teacher
+      // const userRef = doc(db, 'users', currentUser.uid);
+      // await updateDoc(userRef, {
+      //   isTeacher: true,
+      //   teacherProfileId: currentUser.uid,
+      //   updatedAt: serverTimestamp()
+      // });
 
       Alert.alert('Success', 'Teacher profile created successfully!');
       router.back();
@@ -292,3 +327,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 }); 
+
+
+
+
+
+
+
